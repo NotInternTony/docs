@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Grain",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#4b4847",
+    "light": "#cdc2af",
+    "dark": "#4b4847"
   },
   "favicon": {
     "light": "/favicon-light.svg",
@@ -14,77 +14,152 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Home",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Home",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "index"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Get Started",
+        "url": "get-started",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Onboarding & KYB",
             "pages": [
-              "api-reference/introduction"
+              "get-started/onboarding/kyb-requirements",
+              "get-started/onboarding/kyb-dashboard",
+              "get-started/onboarding/onboarding-faq"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Environment Setup",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "get-started/environment-setup/access-credentials",
+              "get-started/environment-setup/sandbox-environment",
+              "get-started/environment-setup/configure-webhooks"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "get-started/quick-start-guide",
+              "get-started/go-live-checklist"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "How Grain Works",
+        "url": "how-grain-works",
+        "groups": [
+          {
+            "group": "How Grain Works",
+            "pages": [
+              "how-grain-works/overview",
+              "how-grain-works/payment-lifecycle",
+              "how-grain-works/settlement",
+              "how-grain-works/supported-cryptocurrencies",
+              "how-grain-works/pricing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Payment SDK",
+        "url": "payment-sdk",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "payment-sdk/overview",
+              "payment-sdk/installation-setup"
+            ]
+          },
+          {
+            "group": "Integration Guide",
+            "pages": [
+              "payment-sdk/integration-guide/initialize-sdk",
+              "payment-sdk/integration-guide/create-payment-session",
+              "payment-sdk/integration-guide/handle-payment-completion",
+              "payment-sdk/integration-guide/handle-errors"
+            ]
+          },
+          {
+            "group": "Testing",
+            "pages": [
+              "payment-sdk/testing/test-in-sandbox",
+              "payment-sdk/testing/simulate-payment-outcomes",
+              "payment-sdk/testing/test-wallets-tokens"
+            ]
+          },
+          {
+            "group": "API Reference",
+            "pages": [
+              "payment-sdk/api-reference/authentication",
+              "payment-sdk/api-reference/endpoints",
+              "payment-sdk/api-reference/error-codes",
+              "payment-sdk/api-reference/rate-limits"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Grain Dashboard",
+        "url": "partner-dashboard",
+        "groups": [
+          {
+            "group": "Grain Dashboard",
+            "pages": [
+              "partner-dashboard/overview"
+            ]
+          },
+          {
+            "group": "Transactions",
+            "pages": [
+              "partner-dashboard/transactions/view-search",
+              "partner-dashboard/transactions/transaction-details",
+              "partner-dashboard/transactions/export-data"
+            ]
+          },
+          {
+            "group": "Reports",
+            "pages": [
+              "partner-dashboard/settlement-reconciliation",
+              "partner-dashboard/analytics-reporting"
+            ]
+          },
+          {
+            "group": "Settings",
+            "pages": [
+              "partner-dashboard/settings/api-keys",
+              "partner-dashboard/settings/webhook-configuration",
+              "partner-dashboard/settings/team-members",
+              "partner-dashboard/settings/notification-preferences"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Support & Resources",
+        "url": "support",
+        "groups": [
+          {
+            "group": "Support & Resources",
+            "pages": [
+              "support/getting-help",
+              "support/system-status",
+              "support/faq",
+              "support/release-notes"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",

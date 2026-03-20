@@ -1,0 +1,56 @@
+---
+title: "Release Notes"
+description: "Latest updates and changes to the Grain platform"
+icon: "clock-rotate-left"
+---
+
+<Tip>
+  Subscribe to release notifications in your Dashboard under **Settings > Notifications** to get notified when new versions are published.
+</Tip>
+
+### v2.4.0 --- March 10, 2026
+
+**Added**
+- Support for USDC payments on the Arbitrum network, giving customers a lower-fee payment option.
+- New `payment.settlement.completed` webhook event so you can track settlement in real time.
+- Bulk export of transaction history as CSV from the Dashboard.
+
+**Improved**
+- Reduced average API response time for the `/payments` endpoint by 35%.
+- Updated the Dashboard transaction detail view with clearer status labels and a timeline of payment lifecycle events.
+
+**Fixed**
+- Resolved an issue where webhook signature verification failed intermittently when the payload contained non-ASCII characters.
+- Fixed a display bug in the Dashboard that showed incorrect settlement amounts for refunded transactions.
+
+---
+
+### v2.3.0 --- February 14, 2026
+
+**Added**
+- Multi-user access for merchant accounts with configurable roles (Owner, Admin, Viewer).
+- Support for setting a preferred settlement currency per payment, overriding the account default.
+
+**Improved**
+- Sandbox environment now simulates realistic blockchain confirmation delays for more accurate integration testing.
+- Webhook retry schedule adjusted to include a faster first retry (30 seconds instead of 5 minutes).
+
+**Fixed**
+- Fixed a race condition that could cause duplicate `payment.confirmed` webhook deliveries under high throughput.
+- Corrected exchange rate display rounding in the customer-facing payment page for JPY-denominated merchants.
+
+---
+
+### v2.2.0 --- January 20, 2026
+
+**Added**
+- Introduced idempotency key support on the `POST /payments` endpoint to prevent duplicate payment creation.
+- New status page integration for real-time service health visibility at [status.grain.com](https://status.grain.com).
+
+**Improved**
+- Upgraded on-chain monitoring to detect payments with zero confirmations, reducing perceived confirmation time for supported networks.
+- Dashboard loading performance improved by 40% through optimized data fetching.
+
+**Fixed**
+- Resolved an issue where expired payment sessions were not correctly marked as `expired` in the API response.
+- Fixed CSV export encoding issue that affected merchants using special characters in product descriptions.

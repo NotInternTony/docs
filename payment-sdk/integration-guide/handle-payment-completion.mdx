@@ -1,0 +1,129 @@
+---
+title: "Handle Payment Completion"
+description: "Process successful payments and update your application"
+icon: "circle-check"
+---
+
+## Client-Side Callbacks
+
+Listen for the `onSuccess` callback to update your UI immediately when a payment completes.
+
+```typescript
+grain.launchPaymentUI(sessionId, {
+  onSuccess: (payment) => {
+    console.log("Payment confirmed:", payment.id);
+    console.log("Transaction hash:", payment.transactionHash);
+    console.log("Amount:", payment.amount, payment.currency);
+
+    // Update your UI
+    showOrderConfirmation(payment);
+  },
+});
+```
+
+### Payment Object
+
+The `onSuccess` callback receives a `Payment` object with these fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Unique payment identifier |
+| `sessionId` | `string` | Associated payment session ID |
+| `status` | `string` | Payment status (`completed`) |
+| `amount` | `string` | Payment amount |
+| `currency` | `string` | Token symbol |
+| `chain` | `string` | Blockchain used |
+| `transactionHash` | `string` | On-chain transaction hash |
+| `senderAddress` | `string` | Customer wallet address |
+| `confirmedAt` | `string` | ISO 8601 timestamp |
+| `metadata` | `object` | Metadata from the session |
+
+## Server-Side Webhook Confirmation
+
+<Warning>
+  Never rely solely on client-side callbacks to fulfill orders. Always confirm payments server-side via webhooks.
+</Warning>
+
+<Steps>
+  <Step title="Register your webhook endpoint">
+    In the [Grain Dashboard](https://dashboard.grain.com), go to **Settings > Webhooks** and add your endpoint URL. Select the `payment.completed` event.
+  </Step>
+
+  <Step title="Handle the webhook">
+    ```typescript
+    // Server-side (Node.js / Express)
+    import { GrainWebhooks } from "@grain-pay/sdk/server";
+
+    const webhooks = new GrainWebhooks({
+      signingSecret: process.env.GRAIN_WEBHOOK_SECRET,
+    });
+
+    app.post("/webhooks/grain", express.raw({ type: "application/json" }), (req, res) => {
+      let event;
+
+      try {
+        event = webhooks.verify(req.body, req.headers["grain-signature"]);
+      } catch (err) {
+        console.error("Webhook verification failed:", err.message);
+        return res.status(400).send("Invalid signature");
+      }
+
+      switch (event.type) {
+        case "payment.completed":
+          const payment = event.data;
+          fulfillOrder(payment.metadata.orderId, payment);
+          break;
+
+        case "payment.failed":
+          handleFailedPayment(event.data);
+          break;
+
+        case "session.expired":
+          handleExpiredSession(event.data);
+          break;
+      }
+
+      res.status(200).json({ received: true });
+    });
+    ```
+  </Step>
+
+  <Step title="Verify and fulfill">
+    Confirm the payment amount and currency match your expected values before fulfilling the order.
+
+    ```typescript
+    async function fulfillOrder(orderId: string, payment: Payment) {
+      const order = await db.orders.findById(orderId);
+
+      if (order.amount !== payment.amount || order.currency !== payment.currency) {
+        console.error("Payment mismatch for order:", orderId);
+        return;
+      }
+
+      await db.orders.update(orderId, {
+        status: "paid",
+        paymentId: payment.id,
+        transactionHash: payment.transactionHash,
+        paidAt: payment.confirmedAt,
+      });
+    }
+    ```
+  </Step>
+</Steps>
+
+## Webhook Events
+
+| Event | Description |
+| --- | --- |
+| `payment.completed` | Payment confirmed on-chain |
+| `payment.failed` | Payment transaction failed |
+| `payment.pending` | Payment submitted, awaiting confirmation |
+| `session.expired` | Payment session expired without payment |
+
+<Tip>
+  Grain retries failed webhook deliveries up to 5 times with exponential backoff. Return a `2xx` status code to acknowledge receipt.
+</Tip>
+
+## Next Steps
+
+Learn how to [Handle Errors & Edge Cases](/payment-sdk/integration-guide/handle-errors) for robust payment flows.

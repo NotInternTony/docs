@@ -1,0 +1,48 @@
+---
+title: "Overview"
+description: "Introduction to the Grain Payment SDK"
+icon: "cube"
+---
+
+## What is the Grain Payment SDK?
+
+The Grain Payment SDK enables you to accept cryptocurrency payments directly in your application. It handles wallet connections, transaction signing, payment confirmations, and settlement — so you can focus on your product.
+
+```typescript
+import { Grain } from "@grain-pay/sdk";
+
+const grain = new Grain({ apiKey: "your-api-key", environment: "production" });
+
+const session = await grain.createPaymentSession({
+  amount: "50.00",
+  currency: "USDC",
+  chain: "ethereum",
+  metadata: { orderId: "order_12345" },
+});
+
+grain.launchPaymentUI(session.id);
+```
+
+## Supported Platforms
+
+The SDK is built for JavaScript and TypeScript, with first-class support across popular frameworks.
+
+| Platform | Support |
+| --- | --- |
+| Vanilla JS / TypeScript | Full |
+| React | Full (hooks + components) |
+| Next.js | Full (App Router + Pages Router) |
+| Vue | Full (composables + components) |
+| Node.js (server-side) | API client only |
+
+## Key Features
+
+- **Payment Sessions** — Create, manage, and track payment sessions with a single API call. Sessions handle token selection, wallet connection, and transaction confirmation.
+- **Event Handling** — Subscribe to real-time payment lifecycle events (`onSuccess`, `onError`, `onPending`, `onExpired`) to keep your UI in sync.
+- **Error Recovery** — Built-in retry logic and graceful degradation for network failures, rejected transactions, and expired sessions.
+- **Multi-chain Support** — Accept payments on Ethereum, Polygon, Arbitrum, Base, and Solana out of the box.
+- **Webhook Confirmations** — Receive server-side confirmation of every payment for reliable order fulfillment.
+
+## Next Steps
+
+Get up and running in minutes. Follow the [Installation & Setup](/payment-sdk/installation-setup) guide to add the SDK to your project, then walk through the [Integration Guide](/payment-sdk/integration-guide/initialize-sdk) to process your first payment.

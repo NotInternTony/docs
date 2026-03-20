@@ -1,0 +1,101 @@
+---
+title: "Test Wallets & Tokens"
+description: "Use test wallets and tokens to simulate payments in sandbox"
+icon: "wallet"
+---
+
+## Grain Test Wallets
+
+Grain provides pre-funded test wallets you can import into your browser wallet extension for sandbox testing.
+
+| Wallet | Address | Chains | Pre-funded Tokens |
+| --- | --- | --- | --- |
+| Test Wallet A | `0x1111...aaaa` | Sepolia, Mumbai, Arbitrum Sepolia | 10,000 USDC, 10 ETH |
+| Test Wallet B | `0x2222...bbbb` | Sepolia, Mumbai, Arbitrum Sepolia | 10,000 USDT, 10 ETH |
+| Test Wallet C | `0x3333...cccc` | Base Sepolia | 10,000 USDC, 5 ETH |
+| Test Wallet D (Solana) | `TEST...xxxx` | Solana Devnet | 10,000 USDC, 100 SOL |
+
+<Warning>
+  These wallets are shared across all sandbox users. Do not use them for anything other than testing. Never send real funds to these addresses.
+</Warning>
+
+## Import a Test Wallet
+
+<Steps>
+  <Step title="Get the private key">
+    Log in to the [Grain Dashboard](https://dashboard.sandbox.grain.com) and go to **Sandbox > Test Wallets**. Click **Reveal Private Key** for the wallet you want to use.
+  </Step>
+
+  <Step title="Import into MetaMask">
+    Open MetaMask, click the account selector, then **Import Account**. Paste the private key and confirm.
+  </Step>
+
+  <Step title="Connect to the testnet">
+    Switch MetaMask to the appropriate testnet (e.g., Sepolia for Ethereum). The Grain SDK automatically points to the correct test network in sandbox mode.
+  </Step>
+</Steps>
+
+## Test Token Faucets
+
+If your test wallet runs low on tokens, use these faucets to top up.
+
+| Token | Chain | Faucet |
+| --- | --- | --- |
+| USDC (test) | Sepolia | `https://faucet.sandbox.grain.com/usdc/sepolia` |
+| USDT (test) | Sepolia | `https://faucet.sandbox.grain.com/usdt/sepolia` |
+| USDC (test) | Mumbai | `https://faucet.sandbox.grain.com/usdc/mumbai` |
+| ETH (test) | Sepolia | `https://faucet.sandbox.grain.com/eth/sepolia` |
+| SOL (test) | Devnet | `https://faucet.sandbox.grain.com/sol/devnet` |
+
+## Fund a Test Wallet Programmatically
+
+Use the Grain API to mint test tokens directly to any wallet address in sandbox.
+
+```bash
+curl -X POST https://api.sandbox.grain.com/v1/faucet/mint \
+  -H "Authorization: Bearer sk_test_your_secret_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "0x1111...aaaa",
+    "token": "USDC",
+    "chain": "sepolia",
+    "amount": "5000.00"
+  }'
+```
+
+```json
+{
+  "success": true,
+  "transactionHash": "0xabc123...",
+  "balance": "15000.00"
+}
+```
+
+<Tip>
+  Use the programmatic faucet in your CI pipeline to ensure test wallets are always funded before running integration tests.
+</Tip>
+
+## Bring Your Own Wallet
+
+You can also use your own wallet on testnets. Fund it from public faucets, then mint Grain test tokens using the faucet API above.
+
+```typescript
+// Mint test USDC to your own wallet
+const res = await fetch("https://api.sandbox.grain.com/v1/faucet/mint", {
+  method: "POST",
+  headers: {
+    Authorization: "Bearer sk_test_your_secret_key",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    address: "0xYourWalletAddress",
+    token: "USDC",
+    chain: "sepolia",
+    amount: "1000.00",
+  }),
+});
+```
+
+## Next Steps
+
+Review the [Authentication](/payment-sdk/api-reference/authentication) guide to understand how API keys work across environments.

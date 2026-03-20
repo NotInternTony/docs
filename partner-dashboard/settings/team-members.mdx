@@ -1,0 +1,69 @@
+---
+title: "Team Members & Roles"
+description: "Invite team members and manage access roles"
+icon: "users"
+---
+
+## Managing Your Team
+
+The Grain Dashboard supports multiple team members, each with a role that controls what they can see and do. This lets you give your developers API access, your finance team visibility into settlements, and your support staff access to transaction details -- all without sharing a single login.
+
+## Available Roles
+
+| Role          | Description                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------- |
+| **Admin**     | Full access to every feature, including billing, API keys, team management, and all settings.      |
+| **Developer** | Can view transactions and analytics, manage API keys and webhooks, but cannot modify billing, team members, or payout settings. |
+| **Viewer**    | Read-only access to transactions, settlements, and analytics. Cannot modify any settings or manage keys. |
+
+<Note>
+  The account owner is automatically assigned the Admin role and cannot be removed or downgraded. At least one Admin must exist on every account.
+</Note>
+
+## Inviting a Team Member
+
+<Steps>
+  <Step title="Open Team Settings">
+    Go to **Settings > Team Members** in the left sidebar.
+  </Step>
+  <Step title="Click Invite Member">
+    Select the **Invite Member** button to open the invitation form.
+  </Step>
+  <Step title="Enter their email">
+    Provide the email address of the person you want to invite. They will receive an email with a link to create their account or sign in.
+  </Step>
+  <Step title="Assign a role">
+    Choose **Admin**, **Developer**, or **Viewer** from the role dropdown. You can change this later.
+  </Step>
+  <Step title="Send the invitation">
+    Click **Send Invite**. The invitation appears in the pending list until the recipient accepts.
+  </Step>
+</Steps>
+
+<Tip>
+  Follow the principle of least privilege -- assign the most restrictive role that still lets the team member do their job. You can always upgrade their role later if needed.
+</Tip>
+
+## Changing a Member's Role
+
+1. On the **Team Members** page, find the member in the active list.
+2. Click the **Role** dropdown next to their name.
+3. Select the new role and confirm the change.
+
+Role changes take effect immediately. The team member does not need to sign out and back in.
+
+## Removing a Team Member
+
+1. Find the member on the **Team Members** page.
+2. Click the **Remove** button next to their name.
+3. Confirm the removal in the dialog.
+
+Once removed, the person loses access to the dashboard immediately. Any API keys they created remain active -- review and revoke them separately if needed.
+
+<Accordion title="What happens to API keys created by a removed member?">
+  API keys are associated with the account, not individual users. Removing a team member does not automatically revoke their keys. Navigate to **Settings > API Keys** to review and revoke any keys that should no longer be active.
+</Accordion>
+
+<Accordion title="Can I re-invite someone who was removed?">
+  Yes. Send a new invitation to their email address. They will need to accept the invitation again, and you can assign a new role at that time.
+</Accordion>

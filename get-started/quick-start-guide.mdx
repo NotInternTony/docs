@@ -1,0 +1,110 @@
+---
+title: "Quick Start Guide"
+description: "Go from zero to accepting crypto payments in minutes"
+icon: "rocket"
+---
+
+## Accept Your First Crypto Payment
+
+This guide walks you through the fastest path from creating your Grain account to processing a test payment. Each step links to a detailed page if you need more information.
+
+<Steps>
+  <Step title="Create your Grain account">
+    Sign up at [dashboard.grain.com/signup](https://dashboard.grain.com/signup) with your business email. You will receive sandbox API keys immediately after registration.
+  </Step>
+
+  <Step title="Complete KYB verification">
+    Submit your business documents through the [KYB Dashboard](/get-started/onboarding/kyb-dashboard) to unlock production access. Review the [KYB Requirements](/get-started/onboarding/kyb-requirements) so you know what to prepare.
+
+    <Tip>
+      You can continue with steps 3 - 6 using sandbox credentials while your KYB application is under review.
+    </Tip>
+  </Step>
+
+  <Step title="Get your API credentials">
+    Navigate to **Developers** > **API Keys** in the dashboard and copy your sandbox keys. See [Access Your Credentials](/get-started/environment-setup/access-credentials) for details on key management.
+  </Step>
+
+  <Step title="Install the Grain SDK">
+    Add the Grain SDK to your project using your preferred package manager.
+
+    <CodeGroup>
+    ```bash npm
+    npm install @grain/sdk
+    ```
+
+    ```bash yarn
+    yarn add @grain/sdk
+    ```
+
+    ```bash pip
+    pip install grain-sdk
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Create your first payment">
+    Initialize the client and create a payment with a few lines of code.
+
+    <CodeGroup>
+    ```javascript Node.js
+    const Grain = require("@grain/sdk");
+
+    const grain = new Grain("sk_sandbox_your_key_here");
+
+    const payment = await grain.payments.create({
+      amount: 50.00,
+      currency: "USD",
+      description: "Order #1234",
+      metadata: {
+        order_id: "1234"
+      }
+    });
+
+    // Redirect your customer to the checkout page
+    console.log(payment.checkout_url);
+    ```
+
+    ```python Python
+    import grain
+
+    client = grain.Client("sk_sandbox_your_key_here")
+
+    payment = client.payments.create(
+        amount=50.00,
+        currency="USD",
+        description="Order #1234",
+        metadata={
+            "order_id": "1234"
+        }
+    )
+
+    # Redirect your customer to the checkout page
+    print(payment.checkout_url)
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Test the payment flow">
+    Open the `checkout_url` in your browser to see the customer-facing payment experience. In the [sandbox environment](/get-started/environment-setup/sandbox-environment), transactions are simulated so no real funds are involved.
+
+    Set up a [webhook endpoint](/get-started/environment-setup/configure-webhooks) to receive a `payment.completed` event when the test payment succeeds.
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Sandbox Environment" icon="flask" href="/get-started/environment-setup/sandbox-environment">
+    Learn how to simulate different payment outcomes for thorough testing.
+  </Card>
+  <Card title="Configure Webhooks" icon="webhook" href="/get-started/environment-setup/configure-webhooks">
+    Set up real-time notifications for payment events.
+  </Card>
+  <Card title="Go-Live Checklist" icon="circle-check" href="/get-started/go-live-checklist">
+    Make sure everything is ready before you switch to production.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Explore the full Grain API for advanced integration options.
+  </Card>
+</CardGroup>

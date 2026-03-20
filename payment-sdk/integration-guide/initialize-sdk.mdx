@@ -1,0 +1,122 @@
+---
+title: "Initialize the SDK"
+description: "Set up the Grain SDK in your application"
+icon: "play"
+---
+
+## Basic Initialization
+
+Import the SDK and create an instance with your configuration.
+
+```typescript
+import { Grain } from "@grain-pay/sdk";
+
+const grain = new Grain({
+  apiKey: "pk_test_your_key",
+  environment: "sandbox",
+  onSuccess: (payment) => console.log("Payment succeeded:", payment.id),
+  onError: (error) => console.error("Payment failed:", error.code),
+});
+```
+
+## Framework Setup
+
+<CodeGroup>
+```tsx React
+import { GrainProvider } from "@grain-pay/sdk/react";
+
+function App() {
+  return (
+    <GrainProvider
+      apiKey="pk_test_your_key"
+      environment="sandbox"
+    >
+      <YourApp />
+    </GrainProvider>
+  );
+}
+```
+
+```tsx Next.js (App Router)
+// app/providers.tsx
+"use client";
+
+import { GrainProvider } from "@grain-pay/sdk/react";
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <GrainProvider
+      apiKey={process.env.NEXT_PUBLIC_GRAIN_KEY!}
+      environment={process.env.NEXT_PUBLIC_GRAIN_ENV as "sandbox" | "production"}
+    >
+      {children}
+    </GrainProvider>
+  );
+}
+```
+
+```vue Vue
+<!-- main.ts -->
+<script>
+import { createApp } from "vue";
+import { GrainPlugin } from "@grain-pay/sdk/vue";
+import App from "./App.vue";
+
+const app = createApp(App);
+
+app.use(GrainPlugin, {
+  apiKey: "pk_test_your_key",
+  environment: "sandbox",
+});
+
+app.mount("#app");
+</script>
+```
+
+```typescript Vanilla JS
+import { Grain } from "@grain-pay/sdk";
+
+const grain = new Grain({
+  apiKey: "pk_test_your_key",
+  environment: "sandbox",
+});
+
+// Attach to window if needed
+window.grain = grain;
+```
+</CodeGroup>
+
+## Configuration Options
+
+| Option | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `apiKey` | `string` | Yes | — | Your publishable API key |
+| `environment` | `"sandbox" \| "production"` | No | `"production"` | Target environment |
+| `onSuccess` | `(payment: Payment) => void` | No | — | Called when a payment completes |
+| `onError` | `(error: GrainError) => void` | No | — | Called when a payment fails |
+| `onPending` | `(payment: Payment) => void` | No | — | Called when a payment is awaiting confirmation |
+| `onExpired` | `(session: Session) => void` | No | — | Called when a session expires |
+| `theme` | `"light" \| "dark" \| "auto"` | No | `"auto"` | Payment UI theme |
+| `locale` | `string` | No | `"en"` | Localization language code |
+
+<Note>
+  Callbacks set during initialization act as global defaults. You can override them per payment session.
+</Note>
+
+## Verify Initialization
+
+Confirm the SDK is ready before creating payment sessions.
+
+```typescript
+const ready = await grain.isReady();
+
+if (ready) {
+  console.log("Grain SDK initialized successfully");
+} else {
+  console.error("Grain SDK failed to initialize");
+}
+```
+
+## Next Steps
+
+Create your first [Payment Session](/payment-sdk/integration-guide/create-payment-session).

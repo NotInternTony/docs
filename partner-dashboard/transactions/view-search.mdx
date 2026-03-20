@@ -1,0 +1,54 @@
+---
+title: "View & Search Transactions"
+description: "Find and filter transactions in the Grain Dashboard"
+icon: "magnifying-glass"
+---
+
+## Accessing the Transactions List
+
+Select **Transactions** from the left navigation bar to open the transactions list. By default, the list shows all transactions from the past 7 days, sorted by most recent first.
+
+Each row displays:
+
+- **Transaction ID** -- a unique identifier you can click to view full details
+- **Date & time** -- when the transaction was created
+- **Amount** -- the requested payment amount and fiat currency
+- **Crypto amount** -- the equivalent amount in the cryptocurrency used
+- **Status** -- the current state of the transaction (e.g., Completed, Pending)
+- **Customer reference** -- the order ID or reference you passed when creating the charge
+
+## Filtering Transactions
+
+Use the filter bar at the top of the list to narrow results. You can combine multiple filters at the same time.
+
+### Available Filters
+
+| Filter         | Options                                                                 |
+| -------------- | ----------------------------------------------------------------------- |
+| **Date range** | Preset ranges (Today, Last 7 days, Last 30 days) or a custom range     |
+| **Status**     | Pending, Confirming, Completed, Failed, Expired, Refunded              |
+| **Amount**     | Minimum and/or maximum fiat amount                                     |
+| **Currency**   | Fiat currency (USD, EUR, GBP, etc.) or cryptocurrency (BTC, ETH, etc.) |
+| **Reference**  | Your order ID or external reference string                              |
+
+<Tip>
+  Click **Save Filter** after setting your criteria to create a reusable filter preset. Saved presets appear in the dropdown next to the filter bar for quick access.
+</Tip>
+
+## Searching by ID or Reference
+
+The search bar at the top of the page accepts:
+
+- **Transaction ID** -- paste the full Grain transaction ID (e.g., `txn_9f8a7b6c5d4e3f2a`)
+- **Customer reference** -- the order ID or reference you included when creating the charge
+- **Customer email** -- if collected during checkout
+
+Search results appear instantly and can be further refined using the filters described above.
+
+## Sorting Results
+
+Click any column header to sort the list by that field. Click again to toggle between ascending and descending order. The active sort column is indicated by an arrow icon.
+
+<Note>
+  The transactions list displays up to 100 results per page. Use the pagination controls at the bottom to move between pages, or narrow your results with filters to find specific records faster.
+</Note>

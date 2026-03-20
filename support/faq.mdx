@@ -1,0 +1,65 @@
+---
+title: "FAQ"
+description: "Frequently asked questions about Grain"
+icon: "circle-question"
+---
+
+## General
+
+<AccordionGroup>
+  <Accordion title="What is Grain?">
+    Grain is a crypto payment processing platform that lets businesses accept cryptocurrency payments from customers and receive settlement in their preferred currency. Grain handles conversion, compliance, and settlement so you can focus on your product.
+  </Accordion>
+
+  <Accordion title="Which countries does Grain support?">
+    Grain is available to merchants in over 40 countries across North America, Europe, and Asia-Pacific. Customer payments can originate from anywhere in the world, but merchant onboarding and settlement are subject to regional availability. Check your eligibility during sign-up or contact [support](/support/getting-help) for the latest list.
+  </Accordion>
+
+  <Accordion title="Which cryptocurrencies can my customers pay with?">
+    Grain currently supports payments in Bitcoin (BTC), Ethereum (ETH), USDC, and USDT across multiple networks. Additional tokens and chains are added regularly. See your Dashboard for the full list of enabled currencies.
+  </Accordion>
+</AccordionGroup>
+
+## Payments
+
+<AccordionGroup>
+  <Accordion title="How long does a crypto payment take to confirm?">
+    Confirmation times depend on the blockchain network used. Most stablecoin payments (USDC, USDT) on supported networks confirm within 1 to 3 minutes. Bitcoin payments typically require at least one confirmation, which averages around 10 minutes. Grain begins processing the payment as soon as the required confirmations are met.
+  </Accordion>
+
+  <Accordion title="Is there a minimum payment amount?">
+    Yes. The minimum payment amount is the equivalent of **$1.00 USD** in the selected cryptocurrency. This threshold helps ensure that network fees do not consume a disproportionate share of the transaction value.
+  </Accordion>
+
+  <Accordion title="How are exchange rates determined?">
+    Grain locks the exchange rate at the moment the customer initiates the payment. The rate is held for a short window (typically 10 to 15 minutes) to give the customer time to complete the on-chain transfer. If the payment is not received within that window, a new rate is quoted.
+  </Accordion>
+</AccordionGroup>
+
+## Security
+
+<AccordionGroup>
+  <Accordion title="How are my funds secured?">
+    Grain uses a combination of institutional-grade custody, multi-signature wallets, and real-time monitoring to protect merchant funds. Received crypto is converted and settled according to your configuration, minimizing the time assets are held on-chain. Grain does not commingle merchant funds with operational funds.
+  </Accordion>
+</AccordionGroup>
+
+## Technical
+
+<AccordionGroup>
+  <Accordion title="Which languages and frameworks does the Grain SDK support?">
+    Grain provides official SDKs for **Node.js**, **Python**, and **Go**. Community-maintained libraries are available for additional languages. If you prefer to integrate directly, the Grain REST API is fully documented in our [API Reference](/api-reference).
+  </Accordion>
+
+  <Accordion title="Does Grain retry failed webhook deliveries?">
+    Yes. If your webhook endpoint returns a non-2xx status code or times out, Grain retries the delivery up to **8 times** using an exponential backoff schedule over approximately 48 hours. You can view delivery attempts and manually re-trigger webhooks from the Dashboard under **Developers > Webhooks**.
+  </Accordion>
+
+  <Accordion title="Can I test my integration without processing real payments?">
+    Absolutely. Grain provides a full **sandbox environment** with test API keys, simulated blockchain confirmations, and mock settlement. You can create test payments, trigger webhooks, and verify your integration end-to-end before going live. Access sandbox credentials from **Settings > API Keys** in your Dashboard.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Did not find what you were looking for? Reach out to our team through the [support channels](/support/getting-help) and we will be happy to help.
+</Tip>

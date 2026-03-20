@@ -1,0 +1,65 @@
+---
+title: "Settlement & Reconciliation"
+description: "Track settlements and reconcile payments in the dashboard"
+icon: "building-columns"
+---
+
+## How Settlements Work
+
+After transactions are completed, Grain batches the funds and settles them to your designated payout account on a regular schedule. By default, settlements occur **daily**, but you can adjust the frequency in **Settings > Payout Preferences**.
+
+Each settlement batch includes all transactions that reached **Completed** status during the settlement window, minus any applicable fees.
+
+## Viewing Settlement History
+
+<Steps>
+  <Step title="Open the Settlements page">
+    Click **Settlements** in the left navigation bar. You will see a chronological list of all settlement batches.
+  </Step>
+  <Step title="Review batch details">
+    Each row shows the settlement date, total amount, number of transactions included, payout method, and status. Click a row to expand the full details.
+  </Step>
+  <Step title="View included transactions">
+    Inside a settlement detail view, the **Transactions** tab lists every transaction that was part of the batch. You can click through to individual transaction details from here.
+  </Step>
+</Steps>
+
+## Settlement Statuses
+
+| Status         | Description                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| **Scheduled**  | The settlement batch has been created and is queued for processing on the next payout cycle.       |
+| **Processing** | Funds are being transferred to your payout account. This typically takes 1-2 business days.        |
+| **Completed**  | The payout has been delivered to your bank account or crypto wallet.                               |
+| **Failed**     | The payout could not be delivered. Check your payout account details in Settings and contact support. |
+
+## Matching Settlements to Transactions
+
+To reconcile a settlement with your internal records:
+
+1. Open the settlement batch and note the **Settlement ID** and total amount.
+2. Switch to the **Transactions** tab within the batch to see every included transaction.
+3. Cross-reference each transaction's **Customer Reference** with orders in your system.
+4. Verify that the sum of individual transaction amounts (minus fees) matches the settlement total.
+
+<Tip>
+  Export the settlement's transaction list as a CSV and import it into your accounting software. The **Customer Reference** column maps directly to your order IDs, making automated matching straightforward.
+</Tip>
+
+## Reconciliation Tips
+
+<Accordion title="Settlement total does not match expected amount">
+  Check whether any fees were deducted. Open the settlement detail view and review the **Fees** section for a line-by-line breakdown. Also verify that no transactions were refunded after the settlement was created.
+</Accordion>
+
+<Accordion title="A transaction is missing from a settlement batch">
+  Confirm the transaction reached **Completed** status before the settlement cutoff time. Transactions that were still **Confirming** at cutoff will roll into the next batch.
+</Accordion>
+
+<Accordion title="Settlement shows as Failed">
+  Navigate to **Settings > Payout Preferences** and verify your bank account or wallet details are correct. If everything looks right, contact Grain support with the Settlement ID for further investigation.
+</Accordion>
+
+<Note>
+  Grain retains settlement records for 18 months. For older records, use the export feature to download and archive your data.
+</Note>
