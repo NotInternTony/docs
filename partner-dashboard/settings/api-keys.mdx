@@ -1,0 +1,75 @@
+---
+title: "API Keys & Credentials"
+description: "Manage your API keys and credentials in the dashboard"
+icon: "key"
+---
+
+## Overview
+
+API keys authenticate your server-side requests to the Grain API. Each key is scoped to a specific environment -- **Sandbox** or **Production** -- so you can develop and test without affecting live transactions.
+
+## Sandbox vs Production Keys
+
+| Property        | Sandbox Keys                          | Production Keys                         |
+| --------------- | ------------------------------------- | --------------------------------------- |
+| **Prefix**      | `sk_sandbox_`                         | `sk_live_`                              |
+| **Environment** | Test environment with simulated funds | Live environment with real crypto       |
+| **Transactions**| Simulated; no real funds move         | Real payments; funds settle to your account |
+| **Rate limits** | Same as production                    | Standard rate limits apply              |
+
+<Note>
+  Always use Sandbox keys during development and testing. Switch to Production keys only when you are ready to accept real payments.
+</Note>
+
+## Viewing Your API Keys
+
+<Steps>
+  <Step title="Navigate to API Keys">
+    Go to **Settings > API Keys** in the left sidebar.
+  </Step>
+  <Step title="Select the environment">
+    Use the environment toggle to switch between Sandbox and Production. Each environment has its own set of keys.
+  </Step>
+  <Step title="View existing keys">
+    Your active keys are listed with a name, creation date, and a masked preview. Click **Reveal** to temporarily display the full key.
+  </Step>
+</Steps>
+
+## Creating a New API Key
+
+<Steps>
+  <Step title="Click Create Key">
+    On the API Keys page, click the **Create Key** button.
+  </Step>
+  <Step title="Name the key">
+    Enter a descriptive name (e.g., "Backend - Production" or "Mobile App - Sandbox") so you can identify it later.
+  </Step>
+  <Step title="Copy and store the key">
+    The full key is displayed once. Copy it immediately and store it in a secure location such as a secrets manager or encrypted environment variable.
+  </Step>
+</Steps>
+
+<Warning>
+  Your API key is shown only once at creation time. If you lose it, you will need to revoke the key and create a new one. Grain cannot retrieve existing keys after they are generated.
+</Warning>
+
+## Revoking an API Key
+
+If a key is compromised or no longer needed:
+
+1. Find the key in the list on the **API Keys** page.
+2. Click the **Revoke** button next to it.
+3. Confirm the action in the dialog.
+
+Revocation takes effect immediately. Any requests using the revoked key will return a `401 Unauthorized` error.
+
+<Tip>
+  Rotate your Production keys periodically as a security best practice. Create a new key, update your server configuration, verify traffic is flowing on the new key, then revoke the old one.
+</Tip>
+
+## Security Best Practices
+
+- **Never expose API keys in client-side code.** Keys should only be used on your server.
+- **Use environment variables** or a secrets manager to store keys -- never hard-code them in source files.
+- **Restrict access** so that only team members with the Admin or Developer role can view or manage keys.
+- **Monitor usage** in the Analytics dashboard to detect unexpected spikes that could indicate a compromised key.

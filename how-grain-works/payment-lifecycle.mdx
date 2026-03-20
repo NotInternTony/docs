@@ -1,0 +1,81 @@
+---
+title: "Payment Lifecycle"
+description: "Understand each stage of a Grain payment from initiation to settlement"
+icon: "arrows-spin"
+---
+
+## From Checkout to Settlement
+
+Every Grain payment moves through a series of stages. Understanding these stages helps you build better integrations and provide clearer status updates to your customers.
+
+<Steps>
+
+### Payment Created
+
+When your customer selects crypto as their payment method, Grain creates a payment session. This generates a unique deposit address and displays the amount owed in the customer's chosen cryptocurrency. The payment session has a configurable expiration window (default: 30 minutes) to account for price volatility.
+
+### Customer Pays
+
+The customer sends cryptocurrency from their wallet to the deposit address provided by Grain. This can be from any compatible wallet — a browser extension wallet, a mobile wallet, or a centralized exchange. Grain monitors the deposit address in real time.
+
+### Blockchain Confirmation
+
+Once the transaction is broadcast to the blockchain network, Grain detects it and marks the payment as **pending**. The transaction must reach the required number of block confirmations before it is considered final. Confirmation times vary by network:
+
+| Network    | Typical Confirmation Time |
+|------------|--------------------------|
+| Ethereum   | ~2 minutes               |
+| Solana     | ~5 seconds               |
+| Polygon    | ~5 seconds               |
+| Base       | ~2 seconds               |
+| Bitcoin    | ~30 minutes              |
+
+### Payment Confirmed
+
+After the required confirmations, the payment status updates to **confirmed**. At this point, the funds are secured and the payment is guaranteed. Grain sends a webhook notification (`payment.confirmed`) to your server so you can fulfill the order.
+
+<Tip>
+  Use the `payment.confirmed` webhook event to trigger order fulfillment. This is the safest point to consider a payment complete.
+</Tip>
+
+### Settlement Initiated
+
+Grain converts the received crypto to your configured settlement currency (e.g., USD, EUR) and initiates a transfer to your bank account. Conversion happens at the market rate at the time of confirmation, so the amount you receive is locked in at this stage.
+
+### Settlement Complete
+
+The funds arrive in your bank account. Settlement timing depends on your settlement schedule and banking provider. Once complete, Grain sends a `settlement.completed` webhook and the transaction is marked as **settled** in your Dashboard.
+
+</Steps>
+
+## Payment Statuses
+
+You can track the status of any payment in the Grain Dashboard or via the API. Here is a summary of all possible statuses:
+
+| Status         | Description                                                  |
+|----------------|--------------------------------------------------------------|
+| `created`      | Payment session generated, awaiting customer transaction     |
+| `pending`      | Transaction detected on-chain, awaiting confirmations        |
+| `confirmed`    | Payment confirmed and conversion initiated                   |
+| `settling`     | Fiat settlement in progress to your bank account             |
+| `settled`      | Funds deposited in your bank account                         |
+| `expired`      | Customer did not pay within the payment session window       |
+| `underpaid`    | Customer sent less than the required amount                  |
+| `overpaid`     | Customer sent more than the required amount                  |
+
+<Note>
+  For underpaid or overpaid transactions, Grain automatically handles refunds or adjustments based on your account settings. You can configure this behavior in the Dashboard under **Settings > Payments**.
+</Note>
+
+## Webhooks
+
+Grain sends webhook events at each major status transition. You can subscribe to these events in your Dashboard or configure them via the API. Key events include:
+
+- `payment.created`
+- `payment.pending`
+- `payment.confirmed`
+- `payment.expired`
+- `settlement.initiated`
+- `settlement.completed`
+
+See the [API Reference](/api-reference) for full webhook payload details.

@@ -1,0 +1,75 @@
+---
+title: "Transaction Details & Statuses"
+description: "Understand transaction details and what each status means"
+icon: "circle-info"
+---
+
+## Viewing Transaction Details
+
+Click any transaction in the transactions list to open its detail view. The detail page is divided into several sections that give you full visibility into the payment lifecycle.
+
+### Payment Summary
+
+At the top of the page you will find:
+
+- **Transaction ID** -- the unique Grain identifier
+- **Status** -- the current state of the transaction (see below)
+- **Created at** -- timestamp when the charge was initiated
+- **Completed at** -- timestamp when the transaction reached a terminal state
+
+### Amount Information
+
+- **Requested amount** -- the fiat amount and currency you charged (e.g., 150.00 USD)
+- **Crypto amount** -- the amount the customer was asked to pay (e.g., 0.00387 BTC)
+- **Exchange rate** -- the rate locked at the time the charge was created
+- **Network fee** -- the blockchain network fee associated with the payment
+
+### Blockchain Details
+
+- **Cryptocurrency** -- the coin or token used (BTC, ETH, USDC, etc.)
+- **Wallet address** -- the deposit address generated for this payment
+- **Transaction hash** -- the on-chain transaction hash, linked to a block explorer
+- **Confirmations** -- the number of network confirmations received
+
+### Your Reference Data
+
+- **Customer reference** -- the order ID or reference you provided
+- **Customer email** -- if collected during checkout
+- **Metadata** -- any custom key-value pairs you attached via the API
+
+## Transaction Statuses
+
+Every Grain transaction moves through a defined set of statuses. Understanding these statuses helps you handle order fulfillment and customer support efficiently.
+
+| Status         | Description                                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Pending**    | The charge has been created and is awaiting payment from the customer. No crypto has been detected on-chain yet.     |
+| **Confirming** | A payment has been detected on the blockchain but has not yet reached the required number of confirmations.          |
+| **Completed**  | The payment is fully confirmed and the funds have been credited to your Grain balance. You can safely fulfill the order. |
+| **Failed**     | The transaction could not be processed. This may occur due to an underpayment or a network-level issue.             |
+| **Expired**    | The customer did not send payment within the allowed time window (typically 60 minutes).                            |
+| **Refunded**   | The payment was completed but has since been refunded to the customer, either fully or partially.                   |
+
+<Note>
+  Only transactions in the **Completed** status should be treated as successful payments. If a transaction is still **Confirming**, wait for it to reach **Completed** before fulfilling the order.
+</Note>
+
+## Status Flow
+
+A typical successful payment follows this path:
+
+<Steps>
+  <Step title="Pending">
+    The charge is created and a payment address is presented to the customer.
+  </Step>
+  <Step title="Confirming">
+    The customer's payment is detected on the blockchain. Grain waits for the required confirmations.
+  </Step>
+  <Step title="Completed">
+    Confirmations are met. The funds are credited to your balance and the order can be fulfilled.
+  </Step>
+</Steps>
+
+<Tip>
+  Use webhooks to receive real-time notifications when a transaction status changes, rather than polling the API or checking the dashboard manually.
+</Tip>

@@ -1,0 +1,83 @@
+---
+title: "Test in Sandbox"
+description: "Validate your integration using the Grain sandbox environment"
+icon: "flask"
+---
+
+## Point the SDK to Sandbox
+
+Set the `environment` option to `sandbox` and use your test API keys.
+
+```typescript
+import { Grain } from "@grain-pay/sdk";
+
+const grain = new Grain({
+  apiKey: "pk_test_your_sandbox_key",
+  environment: "sandbox",
+});
+```
+
+<Note>
+  Sandbox keys are prefixed with `pk_test_` (publishable) and `sk_test_` (secret). Generate them from the [Grain Dashboard](https://dashboard.grain.com) under **Settings > API Keys**.
+</Note>
+
+## Run an End-to-End Test Flow
+
+<Steps>
+  <Step title="Create a payment session">
+    Use your server-side code to create a session with test credentials.
+
+    ```bash
+    curl -X POST https://api.sandbox.grain.com/v1/payment-sessions \
+      -H "Authorization: Bearer sk_test_your_secret_key" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "amount": "10.00",
+        "currency": "USDC",
+        "chain": "ethereum",
+        "metadata": { "orderId": "test_order_001" }
+      }'
+    ```
+  </Step>
+
+  <Step title="Launch the payment UI">
+    Open the payment modal with the returned session ID. In sandbox, the SDK connects to test blockchain networks automatically.
+
+    ```typescript
+    grain.launchPaymentUI("ps_test_abc123", {
+      onSuccess: (payment) => console.log("Test payment succeeded:", payment),
+      onError: (error) => console.error("Test payment failed:", error),
+    });
+    ```
+  </Step>
+
+  <Step title="Complete the payment">
+    Use a [test wallet](/payment-sdk/testing/test-wallets-tokens) funded with test tokens to approve the transaction.
+  </Step>
+
+  <Step title="Verify in the dashboard">
+    Go to the [Grain Dashboard](https://dashboard.sandbox.grain.com) and navigate to **Payments**. Confirm your test payment appears with status `completed`.
+  </Step>
+</Steps>
+
+## Check Webhook Delivery
+
+Sandbox webhooks work identically to production. Verify delivery in the dashboard under **Settings > Webhooks > Recent Deliveries**.
+
+<Tip>
+  Use a tool like [ngrok](https://ngrok.com) to expose your local server and receive sandbox webhooks during development.
+</Tip>
+
+## Sandbox vs Production
+
+| Behavior | Sandbox | Production |
+| --- | --- | --- |
+| Blockchain networks | Testnets (Sepolia, Mumbai, etc.) | Mainnets |
+| Tokens | Test tokens (no real value) | Real tokens |
+| Settlement | Simulated | Real on-chain settlement |
+| Webhooks | Delivered to your endpoint | Delivered to your endpoint |
+| Dashboard | `dashboard.sandbox.grain.com` | `dashboard.grain.com` |
+
+## Next Steps
+
+Learn how to [Simulate Payment Outcomes](/payment-sdk/testing/simulate-payment-outcomes) to test specific success and failure scenarios.

@@ -1,0 +1,83 @@
+---
+title: "Notification Preferences"
+description: "Customize which notifications you and your team receive"
+icon: "bell"
+---
+
+## Overview
+
+Grain can notify you and your team about important events -- such as completed payments, settlement payouts, and security alerts -- so you stay informed without constantly checking the dashboard. Each team member can customize their own notification preferences.
+
+## Notification Types
+
+### Payment Alerts
+
+- **Payment completed** -- triggered when a transaction reaches **Completed** status
+- **Payment failed** -- triggered when a transaction fails or is underpaid
+- **Payment expired** -- triggered when a charge expires without receiving payment
+- **Refund issued** -- triggered when a refund is processed
+
+### Settlement Alerts
+
+- **Settlement completed** -- triggered when a payout is delivered to your bank or wallet
+- **Settlement failed** -- triggered when a payout cannot be processed
+
+### Security Alerts
+
+- **New sign-in detected** -- triggered when a team member signs in from a new device or location
+- **API key created or revoked** -- triggered when API credentials are changed
+- **Team member added or removed** -- triggered when the roster changes
+
+<Note>
+  Security alerts are enabled by default for all Admin users and cannot be fully disabled. This ensures critical security events are always visible to account administrators.
+</Note>
+
+## Configuring Your Preferences
+
+<Steps>
+  <Step title="Open Notification Settings">
+    Go to **Settings > Notifications** in the left sidebar.
+  </Step>
+  <Step title="Choose delivery channels">
+    For each notification type, select one or more delivery channels:
+    - **Email** -- sent to your account email address
+    - **Slack** -- posted to a connected Slack channel
+    - **Dashboard** -- appears in the notification bell in the top navigation bar
+  </Step>
+  <Step title="Save your changes">
+    Click **Save Preferences** at the bottom of the page. Changes take effect immediately.
+  </Step>
+</Steps>
+
+## Connecting Slack
+
+To receive notifications in Slack:
+
+1. Go to **Settings > Notifications** and click **Connect Slack**.
+2. Authorize the Grain app in your Slack workspace.
+3. Select the channel where notifications should be posted.
+4. Toggle on the specific notification types you want delivered to Slack.
+
+<Tip>
+  Create a dedicated Slack channel (e.g., `#grain-payments`) for payment notifications. This keeps alerts organized and makes it easy for your team to monitor activity without cluttering other channels.
+</Tip>
+
+## Per-Member Preferences
+
+Each team member manages their own notification settings independently. Admins cannot override another member's preferences, but they can set organization-wide defaults that apply to new team members.
+
+To set defaults for new members:
+
+1. Navigate to **Settings > Notifications > Defaults**.
+2. Configure the channels and types that should be enabled by default.
+3. Click **Save Defaults**.
+
+New team members will inherit these defaults when they join, and can adjust them afterward.
+
+<Accordion title="Can I receive notifications for only high-value transactions?">
+  Yes. Under **Payment Alerts**, click **Advanced** to set a minimum amount threshold. Notifications will only be sent for transactions above that value.
+</Accordion>
+
+<Accordion title="How do I stop receiving all email notifications?">
+  Uncheck **Email** for every notification type on your preferences page. You will still see alerts in the dashboard notification bell unless you disable that channel as well.
+</Accordion>

@@ -1,0 +1,88 @@
+---
+title: "Webhook Configuration"
+description: "Set up and manage webhook endpoints in the dashboard"
+icon: "webhook"
+---
+
+## What Are Webhooks
+
+Webhooks allow Grain to push real-time event notifications to your server. Instead of polling the API for status changes, your application receives an HTTP POST request whenever a relevant event occurs -- such as a payment completing or a settlement being processed.
+
+## Adding a Webhook Endpoint
+
+<Steps>
+  <Step title="Open Webhook Settings">
+    Navigate to **Settings > Webhooks** in the left sidebar.
+  </Step>
+  <Step title="Click Add Endpoint">
+    Select the **Add Endpoint** button to open the configuration form.
+  </Step>
+  <Step title="Enter your URL">
+    Provide the HTTPS URL where Grain should deliver events (e.g., `https://yourapp.com/webhooks/grain`). The endpoint must be publicly accessible and respond with a `2xx` status code.
+  </Step>
+  <Step title="Select events">
+    Choose which events you want to receive. You can subscribe to all events or pick specific ones:
+    - `charge.created`
+    - `charge.confirming`
+    - `charge.completed`
+    - `charge.failed`
+    - `charge.expired`
+    - `refund.created`
+    - `refund.completed`
+    - `settlement.completed`
+  </Step>
+  <Step title="Save the endpoint">
+    Click **Save**. Grain will send a test ping to your URL to verify it is reachable. If the ping succeeds, the endpoint becomes active.
+  </Step>
+</Steps>
+
+<Note>
+  Each webhook delivery includes a signature in the `X-Grain-Signature` header. Always verify this signature on your server to confirm the request originated from Grain. See the API reference for verification details.
+</Note>
+
+## Testing a Webhook
+
+After adding an endpoint, you can send a test event at any time:
+
+1. Click the **Test** button next to the endpoint.
+2. Select the event type you want to simulate.
+3. Grain sends a sample payload to your URL.
+4. Check the **Delivery Log** (see below) to confirm receipt.
+
+<Tip>
+  Use the test feature during development to verify your handler processes each event type correctly before going live.
+</Tip>
+
+## Viewing Delivery Logs
+
+Every webhook delivery is logged with its timestamp, event type, HTTP status code returned by your server, and response time. To access the logs:
+
+1. Click the endpoint URL in the webhook list.
+2. Open the **Delivery Log** tab.
+3. Click any entry to view the full request payload and your server's response.
+
+Delivery logs are retained for 30 days. Failed deliveries (non-`2xx` responses) are highlighted in red for easy identification.
+
+## Retry Behavior
+
+If your endpoint returns a non-`2xx` status code or times out, Grain retries the delivery with exponential backoff:
+
+| Attempt | Delay after failure |
+| ------- | ------------------- |
+| 1       | 1 minute            |
+| 2       | 5 minutes           |
+| 3       | 30 minutes          |
+| 4       | 2 hours             |
+| 5       | 24 hours            |
+
+After 5 failed attempts, the delivery is marked as failed. You can manually retry any failed delivery from the delivery log.
+
+<Tip>
+  If you see repeated failures in the delivery log, check that your endpoint is returning a `2xx` response promptly. Grain waits up to 10 seconds for a response before treating the delivery as timed out.
+</Tip>
+
+## Managing Endpoints
+
+- **Edit** -- click the endpoint to update its URL or subscribed events.
+- **Disable** -- temporarily pause deliveries without deleting the endpoint.
+- **Delete** -- permanently remove the endpoint and stop all deliveries.

@@ -1,0 +1,75 @@
+---
+title: "Error Codes"
+description: "Reference of Grain API error codes and their meanings"
+icon: "circle-xmark"
+---
+
+## Error Response Format
+
+All API errors return a consistent JSON structure.
+
+```json
+{
+  "error": {
+    "code": "invalid_request",
+    "status": 400,
+    "message": "The 'amount' field is required.",
+    "details": {
+      "field": "amount",
+      "reason": "missing_required_field"
+    }
+  }
+}
+```
+
+## HTTP Status Codes
+
+| Status | Code | Description | Resolution |
+| --- | --- | --- | --- |
+| `400` | `invalid_request` | The request body is malformed or missing required fields | Check the `details.field` value and fix the request payload |
+| `401` | `unauthorized` | The API key is missing, invalid, or revoked | Verify your API key and confirm it has not been revoked in the dashboard |
+| `403` | `forbidden` | The API key does not have permission for this operation | Ensure you are using a secret key for server-side endpoints and that your account has access to the requested resource |
+| `404` | `not_found` | The requested resource does not exist | Verify the resource ID (session, payment, settlement) is correct |
+| `422` | `unprocessable_entity` | The request is well-formed but contains invalid values | Check the `details` object for specific validation errors (e.g., unsupported chain, invalid amount format) |
+| `429` | `rate_limited` | You have exceeded the API rate limit | Wait and retry after the period indicated in the `Retry-After` header. See [Rate Limits](/payment-sdk/api-reference/rate-limits) |
+| `500` | `internal_error` | An unexpected error occurred on Grain's servers | Retry the request with exponential backoff. If the issue persists, contact support |
+
+## SDK Error Codes
+
+These error codes are returned by the client-side SDK via the `onError` callback.
+
+| Code | Description | Retryable |
+| --- | --- | --- |
+| `INSUFFICIENT_FUNDS` | Wallet does not have enough tokens | No |
+| `TRANSACTION_REJECTED` | User rejected the transaction in their wallet | No |
+| `NETWORK_TIMEOUT` | Transaction confirmation timed out | Yes |
+| `SESSION_EXPIRED` | The payment session has expired | No (create a new session) |
+| `CHAIN_UNSUPPORTED` | Wallet is on an unsupported chain | No |
+| `WALLET_DISCONNECTED` | Wallet was disconnected during payment | Yes |
+| `RATE_LIMITED` | API rate limit exceeded | Yes |
+| `UNKNOWN_ERROR` | An unexpected error occurred | Yes |
+
+## Handling Errors in Code
+
+```typescript
+try {
+  const session = await grain.paymentSessions.create({
+    amount: "50.00",
+    currency: "USDC",
+    chain: "ethereum",
+  });
+} catch (error) {
+  if (error.status === 422) {
+    console.error("Validation error:", error.details);
+  } else if (error.status === 429) {
+    const retryAfter = error.headers["retry-after"];
+    console.warn(`Rate limited. Retry after ${retryAfter}s`);
+  } else {
+    console.error(`API error [${error.status}]: ${error.message}`);
+  }
+}
+```
+
+<Tip>
+  Log the full error response (including `details`) during development to speed up debugging. In production, avoid exposing raw error messages to end users.
+</Tip>

@@ -1,0 +1,67 @@
+---
+title: "Export Transaction Data"
+description: "Download transaction records for accounting and reconciliation"
+icon: "file-export"
+---
+
+## Exporting Transactions
+
+The Partner Dashboard lets you download transaction records so you can import them into your accounting software, share them with your finance team, or use them for reconciliation.
+
+<Steps>
+  <Step title="Open the Transactions page">
+    Navigate to **Transactions** in the left sidebar. Apply any filters you need (date range, status, currency) to narrow the dataset before exporting.
+  </Step>
+  <Step title="Click Export">
+    Select the **Export** button in the top-right corner of the transactions list. A dialog will appear with export options.
+  </Step>
+  <Step title="Choose your date range">
+    Confirm or adjust the date range for the export. The range defaults to whatever filters you have active, but you can override it in the export dialog.
+  </Step>
+  <Step title="Select a format">
+    Choose your preferred file format:
+    - **CSV** -- compatible with most spreadsheet and accounting tools
+    - **XLSX** -- Microsoft Excel format with formatted columns and headers
+  </Step>
+  <Step title="Download the file">
+    Click **Download**. The file is generated and downloaded to your browser. For large exports, you will receive an email with a download link when the file is ready.
+  </Step>
+</Steps>
+
+## What the Export Includes
+
+Each exported file contains the following columns:
+
+| Column              | Description                                      |
+| ------------------- | ------------------------------------------------ |
+| Transaction ID      | Unique Grain identifier                          |
+| Status              | Final status at time of export                   |
+| Created At          | Timestamp the charge was created                 |
+| Completed At        | Timestamp the transaction reached a final state  |
+| Requested Amount    | Fiat amount and currency                         |
+| Crypto Amount       | Amount in the cryptocurrency used                |
+| Cryptocurrency      | Coin or token (BTC, ETH, USDC, etc.)             |
+| Exchange Rate       | Rate at the time the charge was created          |
+| Network Fee         | Blockchain fee for the transaction               |
+| Customer Reference  | Your order ID or external reference              |
+| Customer Email      | Email address if collected                       |
+| Transaction Hash    | On-chain hash for completed payments             |
+
+<Note>
+  Exports are limited to **50,000 transactions** per file. If your date range contains more records, split it into smaller ranges or use the Grain API to retrieve data programmatically.
+</Note>
+
+## Scheduled Exports
+
+If you need regular exports for bookkeeping, you can set up a scheduled export:
+
+1. Go to **Settings > Scheduled Exports**.
+2. Choose a frequency (daily, weekly, or monthly).
+3. Select the file format and the email addresses that should receive the file.
+4. Click **Save Schedule**.
+
+Scheduled exports run automatically and are delivered as email attachments or secure download links, depending on file size.
+
+<Tip>
+  Combine scheduled exports with your accounting software's import feature to automate reconciliation without any manual downloads.
+</Tip>

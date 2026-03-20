@@ -1,0 +1,91 @@
+---
+title: "Installation & Setup"
+description: "Install and configure the Grain Payment SDK"
+icon: "download"
+---
+
+## Install the SDK
+
+<CodeGroup>
+```bash npm
+npm install @grain-pay/sdk
+```
+
+```bash yarn
+yarn add @grain-pay/sdk
+```
+
+```bash pnpm
+pnpm add @grain-pay/sdk
+```
+</CodeGroup>
+
+## Configure Your Environment
+
+<Steps>
+  <Step title="Get your API key">
+    Log in to the [Grain Dashboard](https://dashboard.grain.com) and navigate to **Settings > API Keys**. Copy your secret key for server-side use and your publishable key for client-side use.
+
+    <Warning>
+      Never expose your **secret key** in client-side code. Use the publishable key for browser environments and the secret key only on your server.
+    </Warning>
+  </Step>
+
+  <Step title="Initialize the SDK">
+    Import and configure the SDK with your publishable key.
+
+    ```typescript
+    import { Grain } from "@grain-pay/sdk";
+
+    const grain = new Grain({
+      apiKey: "pk_live_your_publishable_key",
+      environment: "production",
+    });
+    ```
+  </Step>
+
+  <Step title="Choose your environment">
+    Use `sandbox` during development and `production` when you go live.
+
+    ```typescript
+    // Development
+    const grain = new Grain({
+      apiKey: "pk_test_your_sandbox_key",
+      environment: "sandbox",
+    });
+
+    // Production
+    const grain = new Grain({
+      apiKey: "pk_live_your_publishable_key",
+      environment: "production",
+    });
+    ```
+
+    <Tip>
+      Sandbox and production use separate API keys. Generate both from the Grain Dashboard.
+    </Tip>
+  </Step>
+
+  <Step title="Verify the installation">
+    Run a quick health check to confirm everything is wired up.
+
+    ```typescript
+    const status = await grain.healthCheck();
+    console.log(status); // { ok: true, environment: "sandbox" }
+    ```
+  </Step>
+</Steps>
+
+## Environment Comparison
+
+| Feature | Sandbox | Production |
+| --- | --- | --- |
+| API key prefix | `pk_test_` / `sk_test_` | `pk_live_` / `sk_live_` |
+| Real funds | No | Yes |
+| Webhooks | Supported | Supported |
+| Rate limits | Relaxed | Standard |
+| Settlement | Simulated | Real |
+
+## Next Steps
+
+Proceed to [Initialize the SDK](/payment-sdk/integration-guide/initialize-sdk) for framework-specific setup instructions.

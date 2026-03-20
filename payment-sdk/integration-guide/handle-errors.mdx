@@ -1,0 +1,148 @@
+---
+title: "Handle Errors & Edge Cases"
+description: "Gracefully handle payment failures, timeouts, and edge cases"
+icon: "triangle-exclamation"
+---
+
+## Error Callback
+
+Register an `onError` callback to catch payment failures on the client.
+
+```typescript
+grain.launchPaymentUI(sessionId, {
+  onError: (error) => {
+    console.error(`[${error.code}] ${error.message}`);
+
+    switch (error.code) {
+      case "INSUFFICIENT_FUNDS":
+        showMessage("Your wallet does not have enough funds.");
+        break;
+      case "TRANSACTION_REJECTED":
+        showMessage("You rejected the transaction in your wallet.");
+        break;
+      case "SESSION_EXPIRED":
+        showMessage("This payment session has expired. Please try again.");
+        break;
+      default:
+        showMessage("Something went wrong. Please try again.");
+    }
+  },
+});
+```
+
+## GrainError Object
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `code` | `string` | Machine-readable error code |
+| `message` | `string` | Human-readable error description |
+| `details` | `object \| null` | Additional context (chain, token, etc.) |
+| `retryable` | `boolean` | Whether the operation can be retried |
+
+## Common Error Scenarios
+
+<Accordion title="INSUFFICIENT_FUNDS">
+  The customer's wallet does not have enough of the required token to complete the payment.
+
+  **Suggested handling:**
+  ```typescript
+  if (error.code === "INSUFFICIENT_FUNDS") {
+    const { required, available, currency } = error.details;
+    showMessage(
+      `You need ${required} ${currency} but only have ${available}. Please add funds and try again.`
+    );
+  }
+  ```
+</Accordion>
+
+<Accordion title="TRANSACTION_REJECTED">
+  The customer rejected the transaction signature request in their wallet.
+
+  **Suggested handling:**
+  ```typescript
+  if (error.code === "TRANSACTION_REJECTED") {
+    showMessage("Transaction cancelled. Click 'Pay' to try again.");
+    // The session is still valid — let them retry
+  }
+  ```
+</Accordion>
+
+<Accordion title="NETWORK_TIMEOUT">
+  The SDK could not confirm the transaction within the expected time. This does not necessarily mean the payment failed — it may still confirm.
+
+  **Suggested handling:**
+  ```typescript
+  if (error.code === "NETWORK_TIMEOUT") {
+    showMessage("Confirmation is taking longer than expected. We'll notify you when it completes.");
+    // Check payment status server-side
+    pollPaymentStatus(sessionId);
+  }
+  ```
+
+  <Warning>
+    Do not assume a timeout means failure. Always verify the final status via your webhook or the [Get Payment Status](/payment-sdk/api-reference/endpoints) endpoint.
+  </Warning>
+</Accordion>
+
+<Accordion title="SESSION_EXPIRED">
+  The payment session exceeded its `expiresIn` duration without a completed payment.
+
+  **Suggested handling:**
+  ```typescript
+  if (error.code === "SESSION_EXPIRED") {
+    // Create a new session and re-launch
+    const newSession = await createPaymentSession(orderId);
+    grain.launchPaymentUI(newSession.id);
+  }
+  ```
+</Accordion>
+
+<Accordion title="CHAIN_UNSUPPORTED">
+  The customer's wallet is connected to a blockchain that is not supported for this payment.
+
+  **Suggested handling:**
+  ```typescript
+  if (error.code === "CHAIN_UNSUPPORTED") {
+    showMessage(`Please switch your wallet to ${error.details.requiredChain}.`);
+  }
+  ```
+</Accordion>
+
+<Accordion title="RATE_LIMITED">
+  Your application has exceeded the API rate limit.
+
+  **Suggested handling:**
+  ```typescript
+  if (error.code === "RATE_LIMITED") {
+    const retryAfter = error.details.retryAfterMs;
+    setTimeout(() => retryPayment(), retryAfter);
+  }
+  ```
+</Accordion>
+
+## Retry Strategy
+
+For retryable errors, implement exponential backoff.
+
+```typescript
+async function retryWithBackoff(fn: () => Promise<void>, maxRetries = 3) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      await fn();
+      return;
+    } catch (error) {
+      if (!error.retryable || attempt === maxRetries - 1) throw error;
+      const delay = Math.pow(2, attempt) * 1000;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+```
+
+<Note>
+  Only retry errors where `error.retryable` is `true`. Errors like `INSUFFICIENT_FUNDS` or `TRANSACTION_REJECTED` require user action and should not be retried automatically.
+</Note>
+
+## Next Steps
+
+Set up your [Sandbox Environment](/payment-sdk/testing/test-in-sandbox) to test error handling before going live.

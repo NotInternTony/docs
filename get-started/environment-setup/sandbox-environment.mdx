@@ -1,0 +1,81 @@
+---
+title: "Sandbox Environment"
+description: "Test your integration in a risk-free sandbox environment"
+icon: "flask"
+---
+
+## What the Sandbox Provides
+
+The Grain sandbox is a fully functional replica of the production environment that uses simulated blockchain transactions instead of real funds. You can use it to:
+
+- Build and test your payment integration end to end
+- Simulate successful payments, failed transactions, and edge cases
+- Verify that your webhook handlers process events correctly
+- Train your team on the Grain dashboard without financial risk
+
+Sandbox access is available immediately after you create your Grain account — no KYB approval required.
+
+## Accessing the Sandbox
+
+### API Base URL
+
+All sandbox API requests use a dedicated base URL:
+
+```
+https://api.sandbox.grain.com/v1
+```
+
+Production requests use `https://api.grain.com/v1`. Make sure your application points to the correct URL for each environment.
+
+### Dashboard
+
+Toggle between sandbox and production in the Grain dashboard using the **Environment** switcher in the top navigation bar. When viewing the sandbox, a yellow banner confirms you are in test mode.
+
+## Key Differences from Production
+
+| Feature                | Sandbox                              | Production                     |
+|------------------------|--------------------------------------|--------------------------------|
+| Blockchain transactions| Simulated (testnet)                  | Real (mainnet)                 |
+| Settlement             | Not processed                        | Settled to your bank account   |
+| Supported currencies   | BTC, ETH, USDC, USDT                | All supported currencies       |
+| Transaction limits     | No limits                            | Subject to your account tier   |
+| Rate limits            | 100 requests per minute              | 1,000 requests per minute      |
+| Data retention         | 90 days                              | Per your data retention policy |
+
+## Test Wallets and Simulated Payments
+
+The sandbox provides pre-funded test wallets so you can simulate payments without interacting with real testnets.
+
+<Tip>
+  Use the special test amounts below to trigger specific payment outcomes in the sandbox. This lets you test your error handling without waiting for real blockchain confirmations.
+</Tip>
+
+| Amount (USD) | Simulated Outcome         |
+|--------------|---------------------------|
+| Any amount   | Successful payment        |
+| $0.01        | Payment expired (timeout) |
+| $0.02        | Underpayment detected     |
+| $0.03        | Overpayment detected      |
+| $0.04        | Network error             |
+
+### Creating a Test Payment
+
+```bash
+curl -X POST https://api.sandbox.grain.com/v1/payments \
+  -H "Authorization: Bearer sk_sandbox_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50.00,
+    "currency": "USD",
+    "description": "Test order #1234",
+    "metadata": {
+      "order_id": "1234"
+    }
+  }'
+```
+
+The response returns a payment object with a `checkout_url` where you can complete the simulated payment flow in your browser.
+
+<Note>
+  Sandbox data is completely separate from production. Payments, customers, and webhooks created in the sandbox do not appear in your production account.
+</Note>

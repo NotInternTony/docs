@@ -1,0 +1,82 @@
+---
+title: "Analytics & Reporting"
+description: "Monitor payment performance with built-in analytics"
+icon: "chart-line"
+---
+
+## Accessing Analytics
+
+Select **Analytics** from the left navigation bar to open the reporting dashboard. The default view shows your payment performance for the past 30 days, with charts and summary cards that update in near real time.
+
+## Key Metrics
+
+The analytics dashboard tracks several core metrics to help you understand how your payment processing is performing.
+
+### Payment Volume
+
+- **Total volume** -- the aggregate fiat value of all completed transactions
+- **Transaction count** -- the number of individual payments processed
+- **Average transaction size** -- the mean fiat value per completed payment
+
+### Conversion Rates
+
+- **Checkout conversion** -- the percentage of created charges that result in a completed payment
+- **Abandonment rate** -- the percentage of charges that expire without payment
+- **Failure rate** -- the percentage of charges that end in a Failed status
+
+### Cryptocurrency Breakdown
+
+- **Popular currencies** -- a ranked list of the most-used cryptocurrencies by your customers (e.g., BTC, ETH, USDC)
+- **Volume by currency** -- total fiat-equivalent volume per cryptocurrency
+- **Currency trend** -- how each cryptocurrency's share has changed over the selected period
+
+## Filtering by Date Range
+
+Use the date picker at the top of the analytics page to adjust the reporting window. Available presets include:
+
+- Today
+- Last 7 days
+- Last 30 days
+- Last 90 days
+- Custom range
+
+All charts and metric cards update instantly when you change the date range.
+
+<Tip>
+  Compare two time periods side by side by enabling **Compare** mode in the date picker. This is useful for measuring the impact of changes to your checkout flow or marketing campaigns.
+</Tip>
+
+## Available Reports
+
+<CardGroup cols={2}>
+  <Card title="Volume Report" icon="chart-bar">
+    Daily or weekly breakdown of payment volume and transaction count. Useful for spotting seasonal trends and growth patterns.
+  </Card>
+  <Card title="Conversion Report" icon="arrows-spin">
+    Tracks checkout-to-payment conversion over time. Helps you identify drop-off points and optimize the payment experience.
+  </Card>
+  <Card title="Currency Report" icon="coins">
+    Shows which cryptocurrencies your customers prefer and how preferences shift over time.
+  </Card>
+  <Card title="Settlement Report" icon="building-columns">
+    Summarizes settled amounts by period, giving your finance team a clear view of incoming funds.
+  </Card>
+</CardGroup>
+
+## Using Reports for Business Decisions
+
+<Accordion title="Optimize your checkout experience">
+  If your conversion report shows a high abandonment rate, consider offering more cryptocurrency options or extending the payment window. Small changes to the checkout flow can significantly improve conversion.
+</Accordion>
+
+<Accordion title="Plan for cash flow">
+  Use the settlement report alongside the volume report to forecast upcoming payouts. This is especially helpful if you operate on a weekly or monthly settlement schedule.
+</Accordion>
+
+<Accordion title="Tailor your crypto offerings">
+  Review the currency report to see which coins your customers use most. If a particular token is growing in popularity, highlight it in your checkout experience to reduce friction.
+</Accordion>
+
+<Note>
+  Analytics data is available for the past 12 months in the dashboard. For historical data beyond that window, use the export feature or query the Grain API directly.
+</Note>

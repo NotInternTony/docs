@@ -1,0 +1,202 @@
+---
+title: "Endpoints"
+description: "Complete reference of Grain API endpoints"
+icon: "code"
+---
+
+## Base URL
+
+| Environment | Base URL |
+| --- | --- |
+| Production | `https://api.grain.com/v1` |
+| Sandbox | `https://api.sandbox.grain.com/v1` |
+
+## Payment Sessions
+
+### Create Payment Session
+
+```
+POST /v1/payment-sessions
+```
+
+Create a new payment session for a customer.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `amount` | `string` | Yes | Payment amount as a decimal string |
+| `currency` | `string` | Yes | Token symbol (`USDC`, `USDT`, `ETH`, `SOL`) |
+| `chain` | `string` | Yes | Target blockchain |
+| `expiresIn` | `number` | No | Session TTL in seconds (default: `1800`) |
+| `metadata` | `object` | No | Custom key-value pairs |
+| `successUrl` | `string` | No | Redirect URL on success |
+| `cancelUrl` | `string` | No | Redirect URL on cancel |
+| `receiverAddress` | `string` | No | Override settlement address |
+
+```bash
+curl -X POST https://api.grain.com/v1/payment-sessions \
+  -H "Authorization: Bearer sk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{"amount":"50.00","currency":"USDC","chain":"ethereum"}'
+```
+
+---
+
+### Get Payment Session
+
+```
+GET /v1/payment-sessions/{session_id}
+```
+
+Retrieve the current state of a payment session.
+
+```bash
+curl https://api.grain.com/v1/payment-sessions/ps_abc123 \
+  -H "Authorization: Bearer sk_live_..."
+```
+
+---
+
+### List Payment Sessions
+
+```
+GET /v1/payment-sessions
+```
+
+List all payment sessions with pagination and optional filters.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `status` | `string` | No | Filter by status (`created`, `completed`, `failed`, `expired`) |
+| `limit` | `number` | No | Results per page (default: `20`, max: `100`) |
+| `starting_after` | `string` | No | Cursor for pagination |
+| `created_gte` | `string` | No | Filter sessions created on or after this ISO 8601 date |
+| `created_lte` | `string` | No | Filter sessions created on or before this ISO 8601 date |
+
+---
+
+## Payments
+
+### Get Payment
+
+```
+GET /v1/payments/{payment_id}
+```
+
+Retrieve details of a completed payment, including the on-chain transaction hash.
+
+```bash
+curl https://api.grain.com/v1/payments/pay_xyz789 \
+  -H "Authorization: Bearer sk_live_..."
+```
+
+---
+
+### List Payments
+
+```
+GET /v1/payments
+```
+
+List all payments with pagination and optional filters.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `status` | `string` | No | Filter by status (`completed`, `failed`, `pending`) |
+| `chain` | `string` | No | Filter by blockchain |
+| `currency` | `string` | No | Filter by token |
+| `limit` | `number` | No | Results per page (default: `20`, max: `100`) |
+| `starting_after` | `string` | No | Cursor for pagination |
+
+---
+
+## Settlements
+
+### Get Settlement
+
+```
+GET /v1/settlements/{settlement_id}
+```
+
+Retrieve details of a settlement batch.
+
+```bash
+curl https://api.grain.com/v1/settlements/stl_456def \
+  -H "Authorization: Bearer sk_live_..."
+```
+
+---
+
+### List Settlements
+
+```
+GET /v1/settlements
+```
+
+List all settlements with pagination.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `status` | `string` | No | Filter by status (`pending`, `completed`, `processing`) |
+| `limit` | `number` | No | Results per page (default: `20`, max: `100`) |
+| `starting_after` | `string` | No | Cursor for pagination |
+
+---
+
+## Webhooks
+
+### List Webhook Endpoints
+
+```
+GET /v1/webhook-endpoints
+```
+
+Retrieve all configured webhook endpoints.
+
+---
+
+### Create Webhook Endpoint
+
+```
+POST /v1/webhook-endpoints
+```
+
+Register a new webhook endpoint.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `url` | `string` | Yes | Endpoint URL |
+| `events` | `string[]` | Yes | Events to subscribe to |
+| `description` | `string` | No | Human-readable label |
+
+---
+
+### Delete Webhook Endpoint
+
+```
+DELETE /v1/webhook-endpoints/{endpoint_id}
+```
+
+Remove a webhook endpoint.
+
+---
+
+## Faucet (Sandbox Only)
+
+### Mint Test Tokens
+
+```
+POST /v1/faucet/mint
+```
+
+Mint test tokens to a wallet address in sandbox.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `address` | `string` | Yes | Wallet address |
+| `token` | `string` | Yes | Token to mint (`USDC`, `USDT`, `ETH`, `SOL`) |
+| `chain` | `string` | Yes | Testnet chain |
+| `amount` | `string` | Yes | Amount to mint |
+
+<Note>
+  All endpoints require [authentication](/payment-sdk/api-reference/authentication) via Bearer token. See [Error Codes](/payment-sdk/api-reference/error-codes) for error response formats.
+</Note>
