@@ -109,11 +109,11 @@
         ]
       },
       {
-        "tab": "Partner Dashboard",
+        "tab": "Grain Dashboard",
         "url": "partner-dashboard",
         "groups": [
           {
-            "group": "Partner Dashboard",
+            "group": "Grain Dashboard",
             "pages": [
               "partner-dashboard/overview"
             ]
