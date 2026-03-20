@@ -73,3 +73,15 @@ Pages covering getting started guides, merchant onboarding, product overviews, a
 - **Guide the reader** — use `<Steps>`, `<Card>`, `<CardGroup>` to create clear paths through content
 - **Visual hierarchy** — use callouts (`<Tip>`, `<Note>`) and cards to break up text and highlight key takeaways
 - **Outcome-oriented** — frame content around what the reader will achieve, not just what to click
+
+## Pull Request Guidelines
+
+When creating a PR, always include a detailed summary of **all changes** in the PR body. This must be generated automatically by reviewing every commit on the branch (not just the latest). The PR body should include:
+
+- **Summary** — bullet list of every meaningful change (new pages, modified pages, config updates, renames, deletions)
+- **Files changed** — grouped by section/directory so reviewers can scan quickly
+- **Test plan** — checklist of what to verify (e.g., navigation renders, links work, content displays correctly)
+
+Use `git diff main...HEAD` and `git log main..HEAD` to gather the full scope of changes before writing the PR description. Never leave out changes from earlier commits.
+
+- **PR title** — must describe the overall update (e.g., "Add Grain Dashboard docs and restructure navigation"), not just the last commit. Keep it under 70 characters.
