@@ -1,121 +1,85 @@
 ---
 title: "Initialize the SDK"
-description: "Set up the Grain SDK in your application"
+description: "Set up the Payment SDK service in your application"
 icon: "play"
 ---
 
-## Basic Initialization
+## SDK Service
 
-Import the SDK and create an instance with your configuration.
+The Payment SDK uses a singleton service that handles script loading, initialization, and payment execution. Import and use it directly in your components.
 
 ```typescript
-import { Grain } from "@grain-pay/sdk";
-
-const grain = new Grain({
-  apiKey: "pk_test_your_key",
-  environment: "sandbox",
-  onSuccess: (payment) => console.log("Payment succeeded:", payment.id),
-  onError: (error) => console.error("Payment failed:", error.code),
-});
+import { cubePayService } from "@/services/cubepay-sdk";
 ```
 
-## Framework Setup
+The service:
+- **Lazy-loads** the SDK bundle on first use (no upfront script loading)
+- **Initializes once** and reuses the same instance across your app
+- Creates a **Shadow DOM** inside the `#cubepay-sdk-root` element for style isolation
 
-<CodeGroup>
-```tsx React
-import { GrainProvider } from "@grain-pay/sdk/react";
+## Initialization Flow
 
-function App() {
-  return (
-    <GrainProvider
-      apiKey="pk_test_your_key"
-      environment="sandbox"
-    >
-      <YourApp />
-    </GrainProvider>
-  );
-}
-```
+When you call `executePayment()` for the first time, the service automatically:
 
-```tsx Next.js (App Router)
-// app/providers.tsx
-"use client";
+<Steps>
+  <Step title="Loads the SDK script">
+    Injects `/vendor/cubist-pay-client-sdk.umd.js` into the page and waits for `window.CubePaySDK` to become available.
+  </Step>
 
-import { GrainProvider } from "@grain-pay/sdk/react";
+  <Step title="Initializes the SDK">
+    Calls `CubePaySDK.init()` with your merchant ID, the container element, and optional configuration (RPC endpoints, theme variables).
+  </Step>
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <GrainProvider
-      apiKey={process.env.NEXT_PUBLIC_GRAIN_KEY!}
-      environment={process.env.NEXT_PUBLIC_GRAIN_ENV as "sandbox" | "production"}
-    >
-      {children}
-    </GrainProvider>
-  );
-}
-```
-
-```vue Vue
-<!-- main.ts -->
-<script>
-import { createApp } from "vue";
-import { GrainPlugin } from "@grain-pay/sdk/vue";
-import App from "./App.vue";
-
-const app = createApp(App);
-
-app.use(GrainPlugin, {
-  apiKey: "pk_test_your_key",
-  environment: "sandbox",
-});
-
-app.mount("#app");
-</script>
-```
-
-```typescript Vanilla JS
-import { Grain } from "@grain-pay/sdk";
-
-const grain = new Grain({
-  apiKey: "pk_test_your_key",
-  environment: "sandbox",
-});
-
-// Attach to window if needed
-window.grain = grain;
-```
-</CodeGroup>
+  <Step title="Returns the SDK instance">
+    The initialized SDK instance is cached. All subsequent calls reuse it without re-initialization.
+  </Step>
+</Steps>
 
 ## Configuration Options
 
-| Option | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `apiKey` | `string` | Yes | — | Your publishable API key |
-| `environment` | `"sandbox" \| "production"` | No | `"production"` | Target environment |
-| `onSuccess` | `(payment: Payment) => void` | No | — | Called when a payment completes |
-| `onError` | `(error: GrainError) => void` | No | — | Called when a payment fails |
-| `onPending` | `(payment: Payment) => void` | No | — | Called when a payment is awaiting confirmation |
-| `onExpired` | `(session: Session) => void` | No | — | Called when a session expires |
-| `theme` | `"light" \| "dark" \| "auto"` | No | `"auto"` | Payment UI theme |
-| `locale` | `string` | No | `"en"` | Localization language code |
+The SDK reads configuration from environment variables automatically. You can customize behavior through these settings:
 
-<Note>
-  Callbacks set during initialization act as global defaults. You can override them per payment session.
-</Note>
+| Option | Environment Variable | Description |
+| --- | --- | --- |
+| Merchant ID | `NEXT_PUBLIC_CUBEPAY_MERCHANT_ID` | **Required.** Identifies your merchant account |
+| API host | `NEXT_PUBLIC_CUBEPAY_API_HOST` | Override the default API endpoint |
+| RPC endpoints | `NEXT_PUBLIC_CUBEPAY_RPC_ENDPOINTS` | Custom RPC URLs per chain ID |
+| Test accounts | `NEXT_PUBLIC_CUBEPAY_TEST_ACCOUNTS` | Private keys for development testing |
 
-## Verify Initialization
+### Custom RPC Endpoints
 
-Confirm the SDK is ready before creating payment sessions.
+Override the default RPC endpoints for specific chains:
 
-```typescript
-const ready = await grain.isReady();
+```bash
+# JSON format
+NEXT_PUBLIC_CUBEPAY_RPC_ENDPOINTS='{"1":"https://eth-mainnet.example.com","8453":"https://base-mainnet.example.com"}'
 
-if (ready) {
-  console.log("Grain SDK initialized successfully");
-} else {
-  console.error("Grain SDK failed to initialize");
+# Comma-separated format
+NEXT_PUBLIC_CUBEPAY_RPC_ENDPOINTS="1=https://eth-mainnet.example.com, 8453=https://base-mainnet.example.com"
+```
+
+## Theme Customization
+
+The SDK applies CSS custom properties to the payment modal. Override these in your `#cubepay-sdk-root` element to match your brand:
+
+```css
+.cubepay-sdk-root {
+  --tint: #2563eb;
+  --background: #ffffff;
+  --background-secondary: #f8fafc;
+  --background-tertiary: #f1f5f9;
+  --label: #0f172a;
+  --label-secondary: #475569;
+  --label-tertiary: #64748b;
+  --label-quaternary: #94a3b8;
+  --system-blue: #2563eb;
+  --separator: rgba(15, 23, 42, 0.08);
 }
 ```
+
+<Tip>
+  Override `--tint` and `--system-blue` to change the primary accent color of the payment modal to match your brand.
+</Tip>
 
 ## Next Steps
 

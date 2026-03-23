@@ -1,47 +1,68 @@
 ---
 title: "Overview"
-description: "Introduction to the Grain Payment SDK"
+description: "Introduction to the Payment SDK — accept crypto payments in your application"
 icon: "cube"
 ---
 
-## What is the Grain Payment SDK?
+## What is the Payment SDK?
 
-The Grain Payment SDK enables you to accept cryptocurrency payments directly in your application. It handles wallet connections, transaction signing, payment confirmations, and settlement — so you can focus on your product.
+The Payment SDK is a drop-in SDK that lets you accept cryptocurrency payments directly in your application. It handles wallet connections, network selection, transaction signing, and payment confirmation — so you can focus on your product.
+
+The SDK renders inside a **Shadow DOM modal** for complete style isolation, supports multiple wallet providers, and works with any JavaScript framework.
 
 ```typescript
-import { Grain } from "@grain-pay/sdk";
-
-const grain = new Grain({ apiKey: "your-api-key", environment: "production" });
-
-const session = await grain.createPaymentSession({
-  amount: "50.00",
-  currency: "USDC",
-  chain: "ethereum",
-  metadata: { orderId: "order_12345" },
+// 1. Create a session on your server
+const session = await fetch("/api/payment-sessions", {
+  method: "POST",
+  body: JSON.stringify({ amount: "50.00", currency: "USD" }),
 });
 
-grain.launchPaymentUI(session.id);
+// 2. Open the payment modal on the client
+const transactionHash = await sdk.open({
+  paymentSessionId: session.paymentSessionId,
+  paymentSessionToken: session.paymentSessionToken,
+});
 ```
 
-## Supported Platforms
+## How It Works
 
-The SDK is built for JavaScript and TypeScript, with first-class support across popular frameworks.
+<Steps>
+  <Step title="Your server creates a payment session">
+    Call the Grain API from your backend with the payment amount and currency. You receive a `paymentSessionId` and `paymentSessionToken`.
+  </Step>
 
-| Platform | Support |
-| --- | --- |
-| Vanilla JS / TypeScript | Full |
-| React | Full (hooks + components) |
-| Next.js | Full (App Router + Pages Router) |
-| Vue | Full (composables + components) |
-| Node.js (server-side) | API client only |
+  <Step title="The SDK opens a payment modal">
+    Pass the session credentials to the client-side SDK. It opens a modal where the customer selects a wallet, connects, and approves the transaction.
+  </Step>
+
+  <Step title="Customer funds a one-time wallet">
+    Each session gets a unique one-time wallet (OTW) address. The customer's funds are sent to this address. The session status moves to `FUNDED`.
+  </Step>
+
+  <Step title="Your server captures the payment">
+    Once funded, your server calls the capture endpoint to transfer funds from the OTW to your treasury wallet. You can capture the full amount or do partial captures.
+  </Step>
+
+  <Step title="You receive confirmation">
+    The SDK returns the transaction hash on success. Your server receives webhooks as the session moves through `FUNDED` → `CAPTURING` → `SUCCEEDED`.
+  </Step>
+</Steps>
 
 ## Key Features
 
-- **Payment Sessions** — Create, manage, and track payment sessions with a single API call. Sessions handle token selection, wallet connection, and transaction confirmation.
-- **Event Handling** — Subscribe to real-time payment lifecycle events (`onSuccess`, `onError`, `onPending`, `onExpired`) to keep your UI in sync.
-- **Error Recovery** — Built-in retry logic and graceful degradation for network failures, rejected transactions, and expired sessions.
-- **Multi-chain Support** — Accept payments on Ethereum, Polygon, Arbitrum, Base, and Solana out of the box.
-- **Webhook Confirmations** — Receive server-side confirmation of every payment for reliable order fulfillment.
+- **Drop-in modal** — Shadow DOM-based payment UI with full style isolation. No CSS conflicts with your application.
+- **Multi-wallet support** — WalletConnect, injected wallets (MetaMask, Coinbase Wallet), and more out of the box.
+- **Payment methods** — Crypto (stablecoins) with additional methods coming soon.
+- **One-time wallets** — Every payment session gets a unique receiving address for clean reconciliation.
+- **Flexible capture** — Capture the full amount or do partial captures. Final capture automatically refunds any remaining balance to the customer.
+- **Webhook confirmations** — Receive server-side status updates via JSON-RPC 2.0 webhooks.
+- **Customizable theme** — Match the payment modal to your brand with CSS custom properties.
+
+## Payment Methods
+
+| Method | Description | Settlement |
+| --- | --- | --- |
+| **Crypto** | Customer pays with stablecoins (USDC) from any supported wallet | On-chain |
 
 ## Next Steps
 

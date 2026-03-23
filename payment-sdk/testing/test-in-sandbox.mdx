@@ -4,80 +4,112 @@ description: "Validate your integration using the Grain sandbox environment"
 icon: "flask"
 ---
 
-## Point the SDK to Sandbox
+## Configure for Sandbox
 
-Set the `environment` option to `sandbox` and use your test API keys.
+Point the SDK to the sandbox API by setting the host environment variable:
 
-```typescript
-import { Grain } from "@grain-pay/sdk";
-
-const grain = new Grain({
-  apiKey: "pk_test_your_sandbox_key",
-  environment: "sandbox",
-});
+```bash
+CUBEPAY_API_HOST=https://api.sandbox.pay.grain.inc
+NEXT_PUBLIC_CUBEPAY_API_HOST=https://api.sandbox.pay.grain.inc
 ```
 
-<Note>
-  Sandbox keys are prefixed with `pk_test_` (publishable) and `sk_test_` (secret). Generate them from the [Grain Dashboard](https://dashboard.grain.com) under **Settings > API Keys**.
-</Note>
+All other environment variables (`NEXT_PUBLIC_CUBEPAY_MERCHANT_ID`, `CUBEPAY_API_KEY`) use your sandbox credentials from the [Grain Dashboard](https://dashboard.grain.inc).
 
-## Run an End-to-End Test Flow
+---
+
+## Run an End-to-End Test
 
 <Steps>
   <Step title="Create a payment session">
-    Use your server-side code to create a session with test credentials.
+    Use your server to create a session against the sandbox API.
 
     ```bash
-    curl -X POST https://api.sandbox.grain.com/v1/payment-sessions \
-      -H "Authorization: Bearer sk_test_your_secret_key" \
+    curl -X POST https://api.sandbox.pay.grain.inc/payment-sessions \
+      -H "Authorization: Bearer your-sandbox-api-key" \
       -H "Content-Type: application/json" \
-      -d '{
-        "amount": "10.00",
-        "currency": "USDC",
-        "chain": "ethereum",
-        "metadata": { "orderId": "test_order_001" }
-      }'
+      -d '{"amount": "10.00", "currency": "USD"}'
     ```
   </Step>
 
-  <Step title="Launch the payment UI">
-    Open the payment modal with the returned session ID. In sandbox, the SDK connects to test blockchain networks automatically.
-
-    ```typescript
-    grain.launchPaymentUI("ps_test_abc123", {
-      onSuccess: (payment) => console.log("Test payment succeeded:", payment),
-      onError: (error) => console.error("Test payment failed:", error),
-    });
-    ```
+  <Step title="Open the payment modal">
+    Launch the SDK on the client with the returned session credentials. In sandbox, the SDK connects to test blockchain networks (Sepolia) automatically.
   </Step>
 
   <Step title="Complete the payment">
-    Use a [test wallet](/payment-sdk/testing/test-wallets-tokens) funded with test tokens to approve the transaction.
+    Connect a wallet funded with testnet tokens and approve the transaction. The SDK handles network switching automatically.
   </Step>
 
   <Step title="Verify in the dashboard">
-    Go to the [Grain Dashboard](https://dashboard.sandbox.grain.com) and navigate to **Payments**. Confirm your test payment appears with status `completed`.
+    Go to the [Grain Dashboard](https://dashboard.grain.inc) and navigate to **Transactions**. Confirm your test payment appears with the expected status.
   </Step>
 </Steps>
 
-## Check Webhook Delivery
+---
 
-Sandbox webhooks work identically to production. Verify delivery in the dashboard under **Settings > Webhooks > Recent Deliveries**.
+## Development Mode (No Credentials)
+
+When `CUBEPAY_API_KEY` is not set and `NODE_ENV` is not `production`, the SDK automatically returns **mock session data**. This lets you build and test your UI without any API credentials.
+
+Mock sessions:
+- Use IDs prefixed with `mock-session-`
+- Return simulated responses for `GET /api/payment-sessions`
+- Skip real API calls entirely
+
+```typescript
+// In development without credentials, this returns mock data
+const result = await cubePayService.executePayment({
+  amount: 10.0,
+  currency: "USD",
+});
+```
 
 <Tip>
-  Use a tool like [ngrok](https://ngrok.com) to expose your local server and receive sandbox webhooks during development.
+  Development mode is useful for UI development and component testing. Use the full sandbox environment for integration testing before going live.
 </Tip>
+
+---
+
+## Test Webhook Delivery
+
+Sandbox webhooks work identically to production. Configure your webhook URL in the dashboard and use a tunneling tool to receive webhooks locally:
+
+```bash
+# Expose your local server
+ngrok http 3000
+```
+
+Then update your webhook URL in the Grain Dashboard to point to your ngrok URL:
+
+```
+https://your-subdomain.ngrok.io/api/transactions/webhook
+```
+
+### Simulate Payment Statuses
+
+Each webhook delivery contains a `status` field. In sandbox, payments progress through the full lifecycle:
+
+| Status | When It Fires |
+| --- | --- |
+| `PENDING` | Session created |
+| `FUNDED` | Testnet tokens received at the one-time wallet |
+| `SUCCEEDED` | Simulated sweep to settlement |
+| `CANCELED` | Payment cancelled (timeout or user action) |
+| `ERROR` | Simulated error condition |
+
+Verify your webhook handler processes each status correctly by monitoring your server logs as you complete test payments.
+
+---
 
 ## Sandbox vs Production
 
 | Behavior | Sandbox | Production |
 | --- | --- | --- |
-| Blockchain networks | Testnets (Sepolia, Mumbai, etc.) | Mainnets |
-| Tokens | Test tokens (no real value) | Real tokens |
+| Blockchain network | Sepolia (testnet) | Ethereum, Base (mainnet) |
+| Tokens | Test USDC (no real value) | Real USDC |
 | Settlement | Simulated | Real on-chain settlement |
 | Webhooks | Delivered to your endpoint | Delivered to your endpoint |
-| Dashboard | `dashboard.sandbox.grain.com` | `dashboard.grain.com` |
+| API host | `api.sandbox.pay.grain.inc` | `api.pay.grain.inc` |
 
-## Next Steps
-
-Learn how to [Simulate Payment Outcomes](/payment-sdk/testing/simulate-payment-outcomes) to test specific success and failure scenarios.
+<Warning>
+  Always test the full payment flow in sandbox before switching to production. Verify that your webhook handler, success screen, and error handling all work as expected.
+</Warning>

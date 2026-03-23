@@ -1,6 +1,6 @@
 ---
 title: "Endpoints"
-description: "Complete reference of Grain API endpoints"
+description: "Complete reference of Payment SDK API endpoints"
 icon: "code"
 ---
 
@@ -8,35 +8,61 @@ icon: "code"
 
 | Environment | Base URL |
 | --- | --- |
-| Production | `https://api.grain.com/v1` |
-| Sandbox | `https://api.sandbox.grain.com/v1` |
+| Production | `https://api.pay.grain.inc` |
+| Sandbox | `https://api.sandbox.pay.grain.inc` |
+
+---
 
 ## Payment Sessions
 
 ### Create Payment Session
 
 ```
-POST /v1/payment-sessions
+POST /payment-sessions
 ```
 
-Create a new payment session for a customer.
+Create a new payment session. Returns a session ID and token for the client-side SDK.
+
+**Headers:**
+
+| Header | Value |
+| --- | --- |
+| `Authorization` | `Bearer {CUBEPAY_API_KEY}` |
+| `Content-Type` | `application/json` |
+
+**Request Body:**
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| `amount` | `string` | Yes | Payment amount as a decimal string |
-| `currency` | `string` | Yes | Token symbol (`USDC`, `USDT`, `ETH`, `SOL`) |
-| `chain` | `string` | Yes | Target blockchain |
-| `expiresIn` | `number` | No | Session TTL in seconds (default: `1800`) |
-| `metadata` | `object` | No | Custom key-value pairs |
-| `successUrl` | `string` | No | Redirect URL on success |
-| `cancelUrl` | `string` | No | Redirect URL on cancel |
-| `receiverAddress` | `string` | No | Override settlement address |
+| `amount` | `string` | Yes | Payment amount as a decimal string (e.g., `"50.00"`) |
+| `currency` | `string` | Yes | Currency code (e.g., `"USD"`) |
+| `requestId` | `string` | No | Idempotency key — your own UUID to prevent duplicate sessions |
+
+**Example:**
 
 ```bash
-curl -X POST https://api.grain.com/v1/payment-sessions \
-  -H "Authorization: Bearer sk_live_..." \
+curl -X POST https://api.pay.grain.inc/payment-sessions \
+  -H "Authorization: Bearer your-api-key" \
   -H "Content-Type: application/json" \
-  -d '{"amount":"50.00","currency":"USDC","chain":"ethereum"}'
+  -d '{"amount": "50.00", "currency": "USD", "requestId": "ord_12345"}'
+```
+
+**Response** `200 OK`:
+
+```json
+{
+  "paymentSessionId": "ps_abc123def456",
+  "paymentSessionToken": "eyJhbGciOiJIUzI1NiIs...",
+  "amount": "50.00",
+  "currency": "USD",
+  "network": "ETHEREUM",
+  "tokenSymbol": "USDC",
+  "oneTimeWalletAddress": "0x1234...abcd",
+  "userAddress": null,
+  "fundingTransactionHash": null,
+  "status": "PENDING",
+  "createdAt": "2026-03-20T12:00:00Z"
+}
 ```
 
 ---
@@ -44,159 +70,213 @@ curl -X POST https://api.grain.com/v1/payment-sessions \
 ### Get Payment Session
 
 ```
-GET /v1/payment-sessions/{session_id}
+GET /payment-sessions/{paymentSessionId}
 ```
 
 Retrieve the current state of a payment session.
 
+**Headers:**
+
+| Header | Value |
+| --- | --- |
+| `Authorization` | `Bearer {paymentSessionToken}` |
+
+**Example:**
+
 ```bash
-curl https://api.grain.com/v1/payment-sessions/ps_abc123 \
-  -H "Authorization: Bearer sk_live_..."
+curl https://api.pay.grain.inc/payment-sessions/ps_abc123def456 \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Response** `200 OK`:
+
+```json
+{
+  "paymentSessionId": "ps_abc123def456",
+  "status": "FUNDED",
+  "amount": "50.00",
+  "currency": "USD",
+  "network": "ETHEREUM",
+  "tokenSymbol": "USDC",
+  "userAddress": "0xCustomerWallet...",
+  "oneTimeWalletAddress": "0xOTW...",
+  "fundingTransactionHash": "0xabc123...",
+  "userSubmittedTransactionHash": "0xdef456...",
+  "createdAt": "2026-03-20T12:00:00Z"
+}
 ```
 
 ---
 
-### List Payment Sessions
+## Captures
+
+### Create Capture
 
 ```
-GET /v1/payment-sessions
+POST /api/v1/payment-sessions/{paymentSessionId}/captures
 ```
 
-List all payment sessions with pagination and optional filters.
+Transfer funds from the one-time wallet (OTW) to your treasury wallet. Supports partial and final captures. Only available when the session status is `FUNDED`.
+
+**Headers:**
+
+| Header | Value |
+| --- | --- |
+| `Authorization` | `Bearer {CUBEPAY_API_KEY}` |
+| `Content-Type` | `application/json` |
+
+**Request Body:**
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| `status` | `string` | No | Filter by status (`created`, `completed`, `failed`, `expired`) |
-| `limit` | `number` | No | Results per page (default: `20`, max: `100`) |
-| `starting_after` | `string` | No | Cursor for pagination |
-| `created_gte` | `string` | No | Filter sessions created on or after this ISO 8601 date |
-| `created_lte` | `string` | No | Filter sessions created on or before this ISO 8601 date |
+| `requestId` | `string` | Yes | Idempotency key to prevent duplicate captures |
+| `captureAmount` | `string` | Yes | Amount to capture (e.g., `"50.00"`) |
+| `isFinalCapture` | `boolean` | No | Default `false`. When `true`, remaining balance is refunded to the customer and session moves to `SUCCEEDED` |
 
----
-
-## Payments
-
-### Get Payment
-
-```
-GET /v1/payments/{payment_id}
-```
-
-Retrieve details of a completed payment, including the on-chain transaction hash.
+**Example:**
 
 ```bash
-curl https://api.grain.com/v1/payments/pay_xyz789 \
-  -H "Authorization: Bearer sk_live_..."
+curl -X POST https://api.pay.grain.inc/api/v1/payment-sessions/ps_abc123def456/captures \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"requestId": "cap_ord_12345", "captureAmount": "50.00", "isFinalCapture": true}'
+```
+
+**Response** `202 Accepted`:
+
+```json
+{
+  "captureId": "cap_xyz789",
+  "captureAmount": "50.00",
+  "refundAmount": "0.00",
+  "status": "CAPTURING"
+}
 ```
 
 ---
 
-### List Payments
+### Get Capture
 
 ```
-GET /v1/payments
+GET /api/v1/payment-sessions/{paymentSessionId}/captures/{captureId}
 ```
 
-List all payments with pagination and optional filters.
+Check the status of a capture operation.
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| `status` | `string` | No | Filter by status (`completed`, `failed`, `pending`) |
-| `chain` | `string` | No | Filter by blockchain |
-| `currency` | `string` | No | Filter by token |
-| `limit` | `number` | No | Results per page (default: `20`, max: `100`) |
-| `starting_after` | `string` | No | Cursor for pagination |
+**Headers:**
 
----
+| Header | Value |
+| --- | --- |
+| `Authorization` | `Bearer {CUBEPAY_API_KEY}` |
 
-## Settlements
-
-### Get Settlement
-
-```
-GET /v1/settlements/{settlement_id}
-```
-
-Retrieve details of a settlement batch.
+**Example:**
 
 ```bash
-curl https://api.grain.com/v1/settlements/stl_456def \
-  -H "Authorization: Bearer sk_live_..."
+curl https://api.pay.grain.inc/api/v1/payment-sessions/ps_abc123def456/captures/cap_xyz789 \
+  -H "Authorization: Bearer your-api-key"
 ```
 
----
+**Response** `200 OK`:
 
-### List Settlements
-
+```json
+{
+  "captureId": "cap_xyz789",
+  "status": "CAPTURED",
+  "captureAmount": "50.00",
+  "refundAmount": "0.00",
+  "captureTransferTransactionHash": "0xcapture123...",
+  "refundTransferTransactionHash": null
+}
 ```
-GET /v1/settlements
-```
 
-List all settlements with pagination.
+### Capture Object
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| `status` | `string` | No | Filter by status (`pending`, `completed`, `processing`) |
-| `limit` | `number` | No | Results per page (default: `20`, max: `100`) |
-| `starting_after` | `string` | No | Cursor for pagination |
+| Field | Type | Description |
+| --- | --- | --- |
+| `captureId` | `string` | Unique capture identifier |
+| `status` | `string` | `CAPTURING` (in progress) or `CAPTURED` (complete) |
+| `captureAmount` | `string` | Amount captured |
+| `refundAmount` | `string` | Amount refunded to customer (on final capture) |
+| `captureTransferTransactionHash` | `string \| null` | On-chain hash of the capture transfer |
+| `refundTransferTransactionHash` | `string \| null` | On-chain hash of the refund transfer (if applicable) |
 
 ---
 
 ## Webhooks
 
-### List Webhook Endpoints
+### Payment Status Update
 
 ```
-GET /v1/webhook-endpoints
+POST {your-webhook-url}
 ```
 
-Retrieve all configured webhook endpoints.
+Grain sends payment status updates to your registered webhook URL as JSON-RPC 2.0 requests.
+
+**Payload:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1770947403693",
+  "method": "cubepay_paymentStatusUpdate",
+  "params": [
+    {
+      "merchantId": "your-merchant-id",
+      "paymentSessionId": "ps_abc123def456",
+      "status": "FUNDED",
+      "updatedAt": "2026-03-20T12:05:00Z"
+    }
+  ]
+}
+```
+
+**Status Values:**
+
+| Status | Description |
+| --- | --- |
+| `CREATED` | Session created, customer has not connected a wallet yet |
+| `PENDING` | Wallet connected, awaiting funding transaction |
+| `FUNDED` | Funds received at the one-time wallet — ready to capture |
+| `CAPTURING` | Capture in progress (funds being transferred) |
+| `SUCCEEDED` | Final capture complete — funds settled to your treasury |
+| `CANCELED` | Session expired or was cancelled (not funded within 24 hours) |
+| `ERROR` | An error occurred during processing |
+
+**Expected Response:**
+
+Return `200` with a JSON-RPC acknowledgment:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "result": "ok"
+}
+```
 
 ---
 
-### Create Webhook Endpoint
+## Response Fields Reference
 
-```
-POST /v1/webhook-endpoints
-```
+### Payment Session Object
 
-Register a new webhook endpoint.
-
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| `url` | `string` | Yes | Endpoint URL |
-| `events` | `string[]` | Yes | Events to subscribe to |
-| `description` | `string` | No | Human-readable label |
-
----
-
-### Delete Webhook Endpoint
-
-```
-DELETE /v1/webhook-endpoints/{endpoint_id}
-```
-
-Remove a webhook endpoint.
-
----
-
-## Faucet (Sandbox Only)
-
-### Mint Test Tokens
-
-```
-POST /v1/faucet/mint
-```
-
-Mint test tokens to a wallet address in sandbox.
-
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| `address` | `string` | Yes | Wallet address |
-| `token` | `string` | Yes | Token to mint (`USDC`, `USDT`, `ETH`, `SOL`) |
-| `chain` | `string` | Yes | Testnet chain |
-| `amount` | `string` | Yes | Amount to mint |
+| Field | Type | Description |
+| --- | --- | --- |
+| `paymentSessionId` | `string` | Unique session identifier |
+| `paymentSessionToken` | `string` | Short-lived token for client-side operations |
+| `amount` | `string` | Payment amount |
+| `currency` | `string` | Currency code |
+| `network` | `string` | Blockchain network (e.g., `ETHEREUM`, `SEPOLIA`) |
+| `tokenSymbol` | `string` | Token used for payment (e.g., `USDC`) |
+| `oneTimeWalletAddress` | `string` | Unique receiving address for this session |
+| `userAddress` | `string \| null` | Customer's wallet address (populated after connection) |
+| `fundingTransactionHash` | `string \| null` | Transaction hash of the funding transfer |
+| `userSubmittedTransactionHash` | `string \| null` | Transaction hash as submitted by the user's wallet |
+| `capturableAmount` | `string` | Remaining balance available for capture |
+| `capturedAmount` | `string` | Total amount captured so far |
+| `captures` | `array` | Array of capture operations with their statuses and transaction hashes |
+| `status` | `string` | Current session status |
+| `createdAt` | `string` | ISO 8601 creation timestamp |
 
 <Note>
-  All endpoints require [authentication](/payment-sdk/api-reference/authentication) via Bearer token. See [Error Codes](/payment-sdk/api-reference/error-codes) for error response formats.
+  All endpoints require [authentication](/payment-sdk/api-reference/authentication). See [Error Codes](/payment-sdk/api-reference/error-codes) for error response formats.
 </Note>

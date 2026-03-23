@@ -92,9 +92,7 @@
           {
             "group": "Testing",
             "pages": [
-              "payment-sdk/testing/test-in-sandbox",
-              "payment-sdk/testing/simulate-payment-outcomes",
-              "payment-sdk/testing/test-wallets-tokens"
+              "payment-sdk/testing/test-in-sandbox"
             ]
           },
           {
@@ -102,8 +100,7 @@
             "pages": [
               "payment-sdk/api-reference/authentication",
               "payment-sdk/api-reference/endpoints",
-              "payment-sdk/api-reference/error-codes",
-              "payment-sdk/api-reference/rate-limits"
+              "payment-sdk/api-reference/error-codes"
             ]
           }
         ]

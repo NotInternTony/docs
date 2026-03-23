@@ -1,148 +1,139 @@
 ---
 title: "Handle Errors & Edge Cases"
-description: "Gracefully handle payment failures, timeouts, and edge cases"
+description: "Gracefully handle payment failures, cancellations, and edge cases"
 icon: "triangle-exclamation"
 ---
 
-## Error Callback
+## User Closes the Modal
 
-Register an `onError` callback to catch payment failures on the client.
+When a customer closes the payment modal without completing, the SDK throws a `CubePayClosedError`. This is not a failure — it means the user chose to cancel.
 
 ```typescript
-grain.launchPaymentUI(sessionId, {
-  onError: (error) => {
-    console.error(`[${error.code}] ${error.message}`);
-
-    switch (error.code) {
-      case "INSUFFICIENT_FUNDS":
-        showMessage("Your wallet does not have enough funds.");
-        break;
-      case "TRANSACTION_REJECTED":
-        showMessage("You rejected the transaction in your wallet.");
-        break;
-      case "SESSION_EXPIRED":
-        showMessage("This payment session has expired. Please try again.");
-        break;
-      default:
-        showMessage("Something went wrong. Please try again.");
-    }
-  },
-});
+try {
+  const result = await cubePayService.executePayment({
+    amount: 50.0,
+    currency: "USD",
+  });
+} catch (error) {
+  if (error.name === "CubePayClosedError") {
+    // User closed the modal — not an error
+    console.log("Payment flow cancelled by user");
+    return;
+  }
+  // Actual error
+  console.error("Payment failed:", error.message);
+}
 ```
 
-## GrainError Object
+<Info>
+  Always check for `CubePayClosedError` before treating a thrown error as a failure. This is the most common "error" you will encounter.
+</Info>
 
-| Field | Type | Description |
+---
+
+## Client-Side Errors
+
+| Error | Cause | Resolution |
 | --- | --- | --- |
-| `code` | `string` | Machine-readable error code |
-| `message` | `string` | Human-readable error description |
-| `details` | `object \| null` | Additional context (chain, token, etc.) |
-| `retryable` | `boolean` | Whether the operation can be retried |
+| `CubePayClosedError` | User closed the payment modal | Let the user retry when ready |
+| Missing merchant ID | `NEXT_PUBLIC_CUBEPAY_MERCHANT_ID` not set | Add the environment variable |
+| Missing container | `#cubepay-sdk-root` element not in DOM | Add the mount point to your layout |
+| Script load failure | SDK bundle not found at `/vendor/cubist-pay-client-sdk.umd.js` | Verify the file exists in your `public/vendor/` directory |
+| SDK initialization failure | `window.CubePaySDK` not available after script load | Check for script loading errors in the browser console |
 
-## Common Error Scenarios
+---
 
-<Accordion title="INSUFFICIENT_FUNDS">
-  The customer's wallet does not have enough of the required token to complete the payment.
+## Server-Side Errors
 
-  **Suggested handling:**
-  ```typescript
-  if (error.code === "INSUFFICIENT_FUNDS") {
-    const { required, available, currency } = error.details;
-    showMessage(
-      `You need ${required} ${currency} but only have ${available}. Please add funds and try again.`
-    );
-  }
-  ```
-</Accordion>
+### Session Creation Errors
 
-<Accordion title="TRANSACTION_REJECTED">
-  The customer rejected the transaction signature request in their wallet.
+| HTTP Status | Cause | Resolution |
+| --- | --- | --- |
+| `400` | Invalid request body or missing fields | Check that `amount` is a positive number and `currency` is provided |
+| `400` | Amount is not a valid number, is zero, or negative | Validate the amount before sending |
+| `401` | Invalid or missing API key | Verify `CUBEPAY_API_KEY` in your environment |
+| `500` | Internal server error | Retry with exponential backoff |
+| `502` | Upstream API unavailable | The payment service is temporarily unreachable — retry shortly |
 
-  **Suggested handling:**
-  ```typescript
-  if (error.code === "TRANSACTION_REJECTED") {
-    showMessage("Transaction cancelled. Click 'Pay' to try again.");
-    // The session is still valid — let them retry
-  }
-  ```
-</Accordion>
-
-<Accordion title="NETWORK_TIMEOUT">
-  The SDK could not confirm the transaction within the expected time. This does not necessarily mean the payment failed — it may still confirm.
-
-  **Suggested handling:**
-  ```typescript
-  if (error.code === "NETWORK_TIMEOUT") {
-    showMessage("Confirmation is taking longer than expected. We'll notify you when it completes.");
-    // Check payment status server-side
-    pollPaymentStatus(sessionId);
-  }
-  ```
-
-  <Warning>
-    Do not assume a timeout means failure. Always verify the final status via your webhook or the [Get Payment Status](/payment-sdk/api-reference/endpoints) endpoint.
-  </Warning>
-</Accordion>
-
-<Accordion title="SESSION_EXPIRED">
-  The payment session exceeded its `expiresIn` duration without a completed payment.
-
-  **Suggested handling:**
-  ```typescript
-  if (error.code === "SESSION_EXPIRED") {
-    // Create a new session and re-launch
-    const newSession = await createPaymentSession(orderId);
-    grain.launchPaymentUI(newSession.id);
-  }
-  ```
-</Accordion>
-
-<Accordion title="CHAIN_UNSUPPORTED">
-  The customer's wallet is connected to a blockchain that is not supported for this payment.
-
-  **Suggested handling:**
-  ```typescript
-  if (error.code === "CHAIN_UNSUPPORTED") {
-    showMessage(`Please switch your wallet to ${error.details.requiredChain}.`);
-  }
-  ```
-</Accordion>
-
-<Accordion title="RATE_LIMITED">
-  Your application has exceeded the API rate limit.
-
-  **Suggested handling:**
-  ```typescript
-  if (error.code === "RATE_LIMITED") {
-    const retryAfter = error.details.retryAfterMs;
-    setTimeout(() => retryPayment(), retryAfter);
-  }
-  ```
-</Accordion>
-
-## Retry Strategy
-
-For retryable errors, implement exponential backoff.
+### Handling Server Errors
 
 ```typescript
-async function retryWithBackoff(fn: () => Promise<void>, maxRetries = 3) {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      await fn();
-      return;
-    } catch (error) {
-      if (!error.retryable || attempt === maxRetries - 1) throw error;
-      const delay = Math.pow(2, attempt) * 1000;
-      await new Promise((resolve) => setTimeout(resolve, delay));
+export async function POST(request: Request) {
+  const { amount, currency } = await request.json();
+
+  // Validate before calling the API
+  const numericAmount = parseFloat(amount);
+  if (isNaN(numericAmount) || !isFinite(numericAmount) || numericAmount <= 0) {
+    return NextResponse.json(
+      { error: "Amount must be a positive number" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const response = await fetch(`${process.env.CUBEPAY_API_HOST}/payment-sessions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.CUBEPAY_API_KEY}`,
+      },
+      body: JSON.stringify({ amount: String(numericAmount), currency }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      return NextResponse.json(
+        { error: errorData?.message || "Failed to create session" },
+        { status: response.status }
+      );
     }
+
+    return NextResponse.json(await response.json());
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Payment service unavailable" },
+      { status: 502 }
+    );
   }
 }
 ```
 
-<Note>
-  Only retry errors where `error.retryable` is `true`. Errors like `INSUFFICIENT_FUNDS` or `TRANSACTION_REJECTED` require user action and should not be retried automatically.
-</Note>
+---
+
+## Webhook Error Handling
+
+Design your webhook handler to be **idempotent** and always return `200`:
+
+```typescript
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { method, params } = body;
+
+    if (method === "cubepay_paymentStatusUpdate") {
+      await processStatusUpdate(params[0]);
+    }
+  } catch (error) {
+    // Log the error but still return 200
+    console.error("Webhook processing error:", error);
+  }
+
+  return NextResponse.json({ jsonrpc: "2.0", result: "ok" });
+}
+```
+
+<Warning>
+  If your webhook handler returns a non-2xx status code, the payment service will retry delivery. Return `200` even when your internal processing fails to avoid duplicate deliveries.
+</Warning>
+
+---
+
+## Development Mode Behavior
+
+When `CUBEPAY_API_KEY` is not set and `NODE_ENV` is not `production`, the SDK service returns **mock session data** instead of calling the API. This lets you develop and test your UI without real credentials.
+
+Mock sessions use IDs prefixed with `mock-session-` and simulate the full payment flow locally.
 
 ## Next Steps
 
-Set up your [Sandbox Environment](/payment-sdk/testing/test-in-sandbox) to test error handling before going live.
+Set up your [Sandbox Environment](/payment-sdk/testing/test-in-sandbox) to test the full payment flow with test networks.

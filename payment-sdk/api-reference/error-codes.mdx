@@ -1,75 +1,108 @@
 ---
 title: "Error Codes"
-description: "Reference of Grain API error codes and their meanings"
+description: "Reference of Payment SDK API and error codes"
 icon: "circle-xmark"
 ---
 
-## Error Response Format
+## HTTP Error Responses
 
-All API errors return a consistent JSON structure.
+All API errors return a JSON response with an error message.
 
 ```json
 {
-  "error": {
-    "code": "invalid_request",
-    "status": 400,
-    "message": "The 'amount' field is required.",
-    "details": {
-      "field": "amount",
-      "reason": "missing_required_field"
-    }
-  }
+  "error": "The 'amount' field is required."
 }
 ```
 
-## HTTP Status Codes
+### Status Codes
 
-| Status | Code | Description | Resolution |
-| --- | --- | --- | --- |
-| `400` | `invalid_request` | The request body is malformed or missing required fields | Check the `details.field` value and fix the request payload |
-| `401` | `unauthorized` | The API key is missing, invalid, or revoked | Verify your API key and confirm it has not been revoked in the dashboard |
-| `403` | `forbidden` | The API key does not have permission for this operation | Ensure you are using a secret key for server-side endpoints and that your account has access to the requested resource |
-| `404` | `not_found` | The requested resource does not exist | Verify the resource ID (session, payment, settlement) is correct |
-| `422` | `unprocessable_entity` | The request is well-formed but contains invalid values | Check the `details` object for specific validation errors (e.g., unsupported chain, invalid amount format) |
-| `429` | `rate_limited` | You have exceeded the API rate limit | Wait and retry after the period indicated in the `Retry-After` header. See [Rate Limits](/payment-sdk/api-reference/rate-limits) |
-| `500` | `internal_error` | An unexpected error occurred on Grain's servers | Retry the request with exponential backoff. If the issue persists, contact support |
-
-## SDK Error Codes
-
-These error codes are returned by the client-side SDK via the `onError` callback.
-
-| Code | Description | Retryable |
+| Status | Description | Resolution |
 | --- | --- | --- |
-| `INSUFFICIENT_FUNDS` | Wallet does not have enough tokens | No |
-| `TRANSACTION_REJECTED` | User rejected the transaction in their wallet | No |
-| `NETWORK_TIMEOUT` | Transaction confirmation timed out | Yes |
-| `SESSION_EXPIRED` | The payment session has expired | No (create a new session) |
-| `CHAIN_UNSUPPORTED` | Wallet is on an unsupported chain | No |
-| `WALLET_DISCONNECTED` | Wallet was disconnected during payment | Yes |
-| `RATE_LIMITED` | API rate limit exceeded | Yes |
-| `UNKNOWN_ERROR` | An unexpected error occurred | Yes |
+| `400` | Invalid request — malformed body, missing fields, or invalid values | Check that `amount` is a positive number and `currency` is provided |
+| `401` | Unauthorized — API key is missing, invalid, or revoked | Verify your `CUBEPAY_API_KEY` environment variable |
+| `500` | Internal server error | Retry with exponential backoff |
+| `502` | Bad gateway — upstream payment service unavailable | The Grain API is temporarily unreachable. Retry shortly |
 
-## Handling Errors in Code
+---
+
+## SDK Errors
+
+These errors are thrown by the client-side SDK service during payment execution.
+
+### CubePayClosedError
+
+Thrown when the user closes the payment modal without completing the transaction. This is **not a failure** — it indicates the user chose to cancel.
 
 ```typescript
 try {
-  const session = await grain.paymentSessions.create({
-    amount: "50.00",
-    currency: "USDC",
-    chain: "ethereum",
-  });
+  const result = await cubePayService.executePayment({ amount: 50, currency: "USD" });
 } catch (error) {
-  if (error.status === 422) {
-    console.error("Validation error:", error.details);
-  } else if (error.status === 429) {
-    const retryAfter = error.headers["retry-after"];
-    console.warn(`Rate limited. Retry after ${retryAfter}s`);
-  } else {
-    console.error(`API error [${error.status}]: ${error.message}`);
+  if (error.name === "CubePayClosedError") {
+    // User cancelled — handle gracefully
+    return;
   }
+  throw error;
 }
 ```
 
-<Tip>
-  Log the full error response (including `details`) during development to speed up debugging. In production, avoid exposing raw error messages to end users.
-</Tip>
+### Initialization Errors
+
+| Error Message | Cause | Resolution |
+| --- | --- | --- |
+| `NEXT_PUBLIC_CUBEPAY_MERCHANT_ID is not set` | Missing merchant ID environment variable | Add the variable to your `.env` file |
+| `Missing CubePay container element with id 'cubepay-sdk-root'` | Mount point not in the DOM | Add `<div id="cubepay-sdk-root" />` to your layout |
+| `Failed to load Cubist Pay SDK script` | SDK bundle not found or failed to load | Verify `public/vendor/cubist-pay-client-sdk.umd.js` exists |
+| `Failed to load Cubist Pay SDK` | `window.CubePaySDK` not available after script loaded | Check the browser console for script errors |
+
+### Session Creation Errors
+
+| Error Message | Cause | Resolution |
+| --- | --- | --- |
+| `Amount must be a positive number` | Invalid amount (zero, negative, NaN, Infinity) | Validate the amount before calling `executePayment` |
+| `Failed to create payment session` | Server returned a non-2xx response | Check server logs for the upstream API error |
+| `Payment service unavailable` | Network error or API timeout | Retry the request |
+
+---
+
+## Webhook Error Handling
+
+Your webhook endpoint should always return `200` regardless of internal processing status:
+
+```typescript
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    await processWebhook(body);
+  } catch (error) {
+    // Log but don't return an error status
+    console.error("Webhook processing failed:", error);
+  }
+
+  // Always acknowledge receipt
+  return NextResponse.json({ jsonrpc: "2.0", result: "ok" });
+}
+```
+
+<Warning>
+  Returning a non-2xx status causes the payment service to retry webhook delivery. Always return `200` to prevent duplicate processing.
+</Warning>
+
+---
+
+## Debugging Tips
+
+<Accordion title="Check the browser console">
+  The SDK logs initialization steps and errors to the browser console. Open DevTools and filter for "CubePay" or "cubepay" messages.
+</Accordion>
+
+<Accordion title="Verify environment variables">
+  Missing or incorrect environment variables are the most common cause of SDK failures. Double-check that `NEXT_PUBLIC_CUBEPAY_MERCHANT_ID` is set on the client and `CUBEPAY_API_KEY` is set on the server.
+</Accordion>
+
+<Accordion title="Use development mode">
+  When `CUBEPAY_API_KEY` is absent and `NODE_ENV` is not `production`, the SDK returns mock data. This is useful for isolating whether an issue is in your code or the API integration.
+</Accordion>
+
+<Accordion title="Inspect network requests">
+  Use the browser Network tab to inspect requests to `/api/payment-sessions`. Check that the request body is valid JSON and the response contains `paymentSessionId` and `paymentSessionToken`.
+</Accordion>

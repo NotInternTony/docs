@@ -1,127 +1,161 @@
 ---
 title: "Create a Payment Session"
-description: "Generate a payment session for your customer"
+description: "Generate a payment session and launch the payment modal"
 icon: "credit-card"
 ---
 
 ## Server-Side: Create a Session
 
-Create payment sessions from your backend using your **secret key**. This returns a session ID that your client uses to launch the payment UI.
+Create payment sessions from your backend using your API key. This returns a session ID and token that the client uses to open the payment modal.
 
 ```typescript
-// Server-side (Node.js / Express)
-import { GrainAPI } from "@grain-pay/sdk/server";
+// app/api/payment-sessions/route.ts (Next.js App Router)
+import { NextResponse } from "next/server";
 
-const grain = new GrainAPI({ secretKey: "sk_test_your_secret_key" });
+export async function POST(request: Request) {
+  const { amount, currency, requestId } = await request.json();
 
-app.post("/api/create-payment", async (req, res) => {
-  const session = await grain.paymentSessions.create({
-    amount: "100.00",
-    currency: "USDC",
-    chain: "ethereum",
-    expiresIn: 1800, // 30 minutes
-    metadata: {
-      orderId: req.body.orderId,
-      customerId: req.body.customerId,
+  const response = await fetch(`${process.env.CUBEPAY_API_HOST}/payment-sessions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.CUBEPAY_API_KEY}`,
     },
-    successUrl: "https://yourapp.com/order/success",
-    cancelUrl: "https://yourapp.com/order/cancel",
+    body: JSON.stringify({
+      amount: String(amount),
+      currency: currency || "USD",
+      requestId,
+    }),
   });
 
-  res.json({ sessionId: session.id });
-});
+  const session = await response.json();
+
+  return NextResponse.json({
+    paymentSessionId: session.paymentSessionId,
+    paymentSessionToken: session.paymentSessionToken,
+  });
+}
 ```
 
 ### Request Parameters
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| `amount` | `string` | Yes | Payment amount as a decimal string |
-| `currency` | `string` | Yes | Token symbol (`USDC`, `USDT`, `ETH`, `SOL`, etc.) |
-| `chain` | `string` | Yes | Target blockchain (`ethereum`, `polygon`, `arbitrum`, `base`, `solana`) |
-| `expiresIn` | `number` | No | Session TTL in seconds (default: `1800`) |
-| `metadata` | `object` | No | Arbitrary key-value pairs attached to the session |
-| `successUrl` | `string` | No | Redirect URL after successful payment |
-| `cancelUrl` | `string` | No | Redirect URL if the customer cancels |
-| `receiverAddress` | `string` | No | Override the default settlement address |
+| `amount` | `string` | Yes | Payment amount as a decimal string (e.g., `"50.00"`) |
+| `currency` | `string` | Yes | Currency code (e.g., `"USD"`) |
+| `requestId` | `string` | No | Idempotency key — pass your own UUID to prevent duplicate sessions |
 
 ### Response
 
 ```json
 {
-  "id": "ps_abc123def456",
-  "status": "created",
-  "amount": "100.00",
-  "currency": "USDC",
-  "chain": "ethereum",
-  "expiresAt": "2026-03-20T12:30:00Z",
-  "paymentUrl": "https://pay.grain.com/ps_abc123def456",
-  "metadata": {
-    "orderId": "order_12345",
-    "customerId": "cust_67890"
+  "paymentSessionId": "ps_abc123def456",
+  "paymentSessionToken": "eyJhbGciOiJIUzI1NiIs...",
+  "amount": "50.00",
+  "currency": "USD",
+  "network": "SEPOLIA",
+  "tokenSymbol": "USDC",
+  "oneTimeWalletAddress": "0x1234...abcd",
+  "status": "PENDING",
+  "createdAt": "2026-03-20T12:00:00Z"
+}
+```
+
+<Warning>
+  The `paymentSessionToken` is a short-lived credential scoped to this session. Pass it to the client, but never log or store it permanently.
+</Warning>
+
+---
+
+## Client-Side: Launch the Payment Modal
+
+Pass the session credentials to the SDK service to open the payment modal.
+
+```typescript
+import { cubePayService } from "@/services/cubepay-sdk";
+
+async function handlePayment(amount: number) {
+  try {
+    const result = await cubePayService.executePayment({
+      amount,
+      currency: "USD",
+    });
+
+    // Payment succeeded
+    console.log("Transaction hash:", result.transactionHash);
+    console.log("Session:", result.session);
+  } catch (error) {
+    // Payment failed or was cancelled
+    console.error("Payment error:", error);
   }
 }
 ```
 
-## Client-Side: Launch the Payment UI
+### What `executePayment` Does
 
-Pass the session ID to the SDK on the client to open the payment modal.
+The `executePayment` method handles the full payment lifecycle:
 
-<CodeGroup>
-```tsx React
-import { useGrain } from "@grain-pay/sdk/react";
+<Steps>
+  <Step title="Creates the session">
+    Calls your server's `POST /api/payment-sessions` endpoint with the amount and currency.
+  </Step>
 
-function CheckoutButton({ orderId }: { orderId: string }) {
-  const { launchPayment } = useGrain();
+  <Step title="Initializes the SDK">
+    Loads the SDK bundle (if not already loaded) and initializes it with your merchant configuration.
+  </Step>
 
-  const handleCheckout = async () => {
-    const res = await fetch("/api/create-payment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ orderId }),
-    });
-    const { sessionId } = await res.json();
+  <Step title="Opens the modal">
+    Calls `sdk.open()` with the session ID and token. The customer sees the payment modal with wallet options.
+  </Step>
 
-    launchPayment(sessionId, {
-      onSuccess: (payment) => {
-        window.location.href = `/order/success?id=${payment.id}`;
-      },
-      onError: (error) => {
+  <Step title="Returns the result">
+    On success, returns the transaction hash and session details. On cancellation, throws a `CubePayClosedError`.
+  </Step>
+</Steps>
+
+## Using in a React Component
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { cubePayService } from "@/services/cubepay-sdk";
+
+export function PayButton({ amount }: { amount: number }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      const result = await cubePayService.executePayment({
+        amount,
+        currency: "USD",
+      });
+      // Redirect to success page or update UI
+      window.location.href = `/success?tx=${result.transactionHash}`;
+    } catch (error) {
+      if (error.name === "CubePayClosedError") {
+        // User closed the modal — not an error
+        console.log("Payment cancelled by user");
+      } else {
         console.error("Payment failed:", error.message);
-      },
-    });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return <button onClick={handleCheckout}>Pay with Crypto</button>;
+  return (
+    <button onClick={handleClick} disabled={loading}>
+      {loading ? "Processing..." : `Pay $${amount.toFixed(2)}`}
+    </button>
+  );
 }
 ```
 
-```typescript Vanilla JS
-const grain = new Grain({ apiKey: "pk_test_your_key", environment: "sandbox" });
-
-document.getElementById("pay-btn").addEventListener("click", async () => {
-  const res = await fetch("/api/create-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ orderId: "order_12345" }),
-  });
-  const { sessionId } = await res.json();
-
-  grain.launchPaymentUI(sessionId, {
-    onSuccess: (payment) => {
-      window.location.href = `/order/success?id=${payment.id}`;
-    },
-    onError: (error) => {
-      console.error("Payment failed:", error.message);
-    },
-  });
-});
-```
-</CodeGroup>
-
-<Tip>
-  You can also redirect customers to the hosted `paymentUrl` returned in the session response instead of using the embedded modal.
-</Tip>
+<Info>
+  The SDK modal supports both mobile (drawer) and desktop (dialog) layouts automatically based on viewport size.
+</Info>
 
 ## Next Steps
 
