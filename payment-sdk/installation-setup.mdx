@@ -1,91 +1,89 @@
 ---
 title: "Installation & Setup"
-description: "Install and configure the Grain Payment SDK"
+description: "Set up the Payment SDK in your application"
 icon: "download"
 ---
 
-## Install the SDK
+## Prerequisites
 
-<CodeGroup>
-```bash npm
-npm install @grain-pay/sdk
-```
+- A Grain merchant account with a **Merchant ID**
+- A server-side **API key** for creating payment sessions
+- Node.js 18+ (for Next.js applications)
 
-```bash yarn
-yarn add @grain-pay/sdk
-```
-
-```bash pnpm
-pnpm add @grain-pay/sdk
-```
-</CodeGroup>
-
-## Configure Your Environment
+## Get Your Credentials
 
 <Steps>
+  <Step title="Get your Merchant ID">
+    Log in to the [Grain Dashboard](https://dashboard.grain.inc) and navigate to **Settings > API Keys**. Copy your **Merchant ID** — this is used to initialize the client-side SDK.
+  </Step>
+
   <Step title="Get your API key">
-    Log in to the [Grain Dashboard](https://dashboard.grain.com) and navigate to **Settings > API Keys**. Copy your secret key for server-side use and your publishable key for client-side use.
+    From the same page, copy your **API Key**. This is your server-side secret used to create payment sessions.
 
     <Warning>
-      Never expose your **secret key** in client-side code. Use the publishable key for browser environments and the secret key only on your server.
+      Never expose your API key in client-side code. It should only be used in server-side route handlers or backend services.
     </Warning>
   </Step>
-
-  <Step title="Initialize the SDK">
-    Import and configure the SDK with your publishable key.
-
-    ```typescript
-    import { Grain } from "@grain-pay/sdk";
-
-    const grain = new Grain({
-      apiKey: "pk_live_your_publishable_key",
-      environment: "production",
-    });
-    ```
-  </Step>
-
-  <Step title="Choose your environment">
-    Use `sandbox` during development and `production` when you go live.
-
-    ```typescript
-    // Development
-    const grain = new Grain({
-      apiKey: "pk_test_your_sandbox_key",
-      environment: "sandbox",
-    });
-
-    // Production
-    const grain = new Grain({
-      apiKey: "pk_live_your_publishable_key",
-      environment: "production",
-    });
-    ```
-
-    <Tip>
-      Sandbox and production use separate API keys. Generate both from the Grain Dashboard.
-    </Tip>
-  </Step>
-
-  <Step title="Verify the installation">
-    Run a quick health check to confirm everything is wired up.
-
-    ```typescript
-    const status = await grain.healthCheck();
-    console.log(status); // { ok: true, environment: "sandbox" }
-    ```
-  </Step>
 </Steps>
+
+## Configure Environment Variables
+
+Add the following to your `.env` file:
+
+```bash
+# Required
+NEXT_PUBLIC_CUBEPAY_MERCHANT_ID=your-merchant-id    # Client-side: SDK initialization
+CUBEPAY_API_KEY=your-api-key                         # Server-side: session creation
+
+# Optional
+CUBEPAY_API_HOST=https://api.pay.grain.inc           # API host (defaults to production)
+NEXT_PUBLIC_CUBEPAY_API_HOST=https://api.pay.grain.inc  # Client-side API host override
+```
+
+## Add the SDK Mount Point
+
+The Payment SDK renders its payment modal inside a dedicated DOM element. Add this to your root layout:
+
+```tsx
+// app/layout.tsx
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <div id="cubepay-sdk-root" className="cubepay-sdk-root" />
+      </body>
+    </html>
+  );
+}
+```
+
+<Info>
+  The SDK creates a **Shadow DOM** inside this element, so its styles are fully isolated from your application. No CSS conflicts.
+</Info>
+
+## Load the SDK Bundle
+
+The client-side SDK is distributed as a UMD bundle. Place it in your public directory:
+
+```
+public/
+  vendor/
+    cubist-pay-client-sdk.umd.js
+```
+
+The SDK service loads this script lazily on first use — no manual script tags needed.
 
 ## Environment Comparison
 
 | Feature | Sandbox | Production |
 | --- | --- | --- |
-| API key prefix | `pk_test_` / `sk_test_` | `pk_live_` / `sk_live_` |
+| Blockchain networks | Testnets (Sepolia) | Mainnets (Ethereum, Base) |
 | Real funds | No | Yes |
 | Webhooks | Supported | Supported |
-| Rate limits | Relaxed | Standard |
-| Settlement | Simulated | Real |
+| Settlement | Simulated | Real on-chain settlement |
+| API host | `api.sandbox.pay.grain.inc` | `api.pay.grain.inc` |
 
 ## Next Steps
 
-Proceed to [Initialize the SDK](/payment-sdk/integration-guide/initialize-sdk) for framework-specific setup instructions.
+Proceed to [Initialize the SDK](/payment-sdk/integration-guide/initialize-sdk) to set up the SDK service and process your first payment.
