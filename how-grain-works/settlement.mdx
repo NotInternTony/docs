@@ -6,23 +6,26 @@ icon: "building-columns"
 
 ## How Settlement Works
 
-After a crypto payment is confirmed, Grain converts the received cryptocurrency to your settlement currency and transfers the funds to your bank account. You always receive fiat — never crypto.
+After a crypto payment is confirmed, Grain converts the received cryptocurrency to your chosen settlement currency and transfers the funds to your account. By default, you receive fiat directly to your bank account. If you prefer, you can opt to receive settlement in a supported stablecoin instead.
 
 Settlement is fully automatic. Once you configure your bank account and settlement preferences in the Grain Dashboard, every confirmed payment flows through to your account without manual intervention.
 
 ## Settlement Schedule
 
-Grain offers the following settlement windows:
+Settlement timing depends on your chosen settlement method:
 
-| Schedule   | Description                                                        |
-|------------|--------------------------------------------------------------------|
-| **T+1**    | Funds settle to your bank account the next business day            |
-| **T+2**    | Funds settle within two business days (default for new accounts)   |
-| **Weekly** | All confirmed payments within the week settle each Monday          |
+| Method                  | Timeline       | Description                                                                                      |
+|-------------------------|----------------|--------------------------------------------------------------------------------------------------|
+| **Stablecoin**          | **T+0**        | Funds settle same day once the payment is confirmed on-chain                                     |
+| **ACH**                 | **T+0 / T+1**  | Funds settle same day or next business day depending on when the settlement is submitted          |
+| **Domestic Wire**       | **T+0 / T+1**  | Funds settle same day or next business day via domestic wire transfer                             |
+| **International Wire**  | **T+2 / T+3**  | Funds settle within two to three business days via international wire transfer                    |
 
-<Tip>
-  You can change your settlement schedule at any time from the Dashboard under **Settings > Settlement**. Faster settlement schedules may be available based on your processing volume.
-</Tip>
+Settlement scheduling is configured automatically — no manual setup required.
+
+<Info>
+  Final settlement timing for fiat payments is subject to the receiving bank's processing schedule. If your settlement method is wire, additional wire transfer fees may be incurred by your bank.
+</Info>
 
 ## Settlement Amount Calculation
 
@@ -40,34 +43,38 @@ For example, if a customer pays the equivalent of $100.00 USD and your transacti
 | Transaction fee (1%)| −$1.00     |
 | **Settlement amount**| **$99.00** |
 
-There are no additional settlement fees, wire fees, or hidden charges. The transaction fee is the only deduction applied.
+<Info>
+  The transaction fee is the only deduction applied by Grain. Note that if your settlement method is wire, your receiving bank may charge additional wire transfer fees.
+</Info>
 
 ## Supported Settlement Currencies
 
-Grain currently supports settlement in the following fiat currencies:
+### Fiat
+
+Grain currently supports settlement in the following fiat currency:
 
 - **USD** — US Dollar
+
+The following currencies are coming soon to Grain:
+
 - **EUR** — Euro
 - **GBP** — British Pound
 - **CAD** — Canadian Dollar
 - **AUD** — Australian Dollar
 
-<Note>
-  If your preferred currency is not listed, contact your account manager or reach out to [sales@grain.com](mailto:sales@grain.com). Grain is actively expanding settlement currency support.
-</Note>
+### Stablecoin
 
-## Viewing Settlement Details
+Grain currently supports settlement in the following stablecoins:
 
-You can track every settlement in the Grain Dashboard:
+- **USDC** — USD Coin
+- **USDT** — USD Tether
 
-1. Navigate to **Settlements** in the left sidebar.
-2. Each settlement entry shows the total amount, number of payments included, fee breakdown, and bank transfer status.
-3. Click any settlement to see the individual payments that were included.
+The following stablecoins are coming soon to Grain:
 
-You can also retrieve settlement data programmatically using the [Settlements API](/api-reference).
+- **USD1** — World Liberty USD
+- **PYUSD** — PayPal USD
 
-## Settlement Reconciliation
+<Info>
+  If your desired currency is not listed, please contact us for supportability.
+</Info>
 
-Each settlement includes a unique reference ID that appears on your bank statement. You can match this reference ID to the settlement record in the Dashboard or API for easy reconciliation with your accounting systems.
-
-Grain also supports CSV and JSON exports of settlement data for integration with tools like QuickBooks, Xero, or your own reporting pipeline.

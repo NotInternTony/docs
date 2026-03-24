@@ -6,56 +6,65 @@ icon: "layout-dashboard"
 
 ## Welcome to the Grain Dashboard
 
-The Grain Dashboard is your central hub for managing crypto payment processing. From here, you can monitor transactions in real time, track settlements, analyze payment performance, and configure your integration settings.
+The Grain Dashboard is your central hub for managing crypto payment processing. From here, you can monitor transactions in real time, track payouts, and configure your account settings.
 
-After signing in at [dashboard.grain.co](https://dashboard.grain.co), you land on the **Home** screen, which provides a snapshot of your recent activity, including today's transaction volume, pending settlements, and any items that need your attention.
+<Frame>
+  <img src="/images/dashboard/dashboard-overview.png" alt="Grain Dashboard overview" />
+</Frame>
+
+After signing in at [dashboard.grain.co](https://dashboard.grain.co), you land on the **Home** screen with a snapshot of your sales volume, transaction count, and recent activity.
 
 ## Main Navigation
 
-The primary navigation bar runs along the left side of the dashboard. It is organized into four main areas:
+The primary navigation runs along the left side of the dashboard, organized into three main areas:
+
+### Dashboard
+
+Your command center with key metrics, a performance chart, payout summary, and recent transactions — everything you need at a glance.
 
 ### Transactions
 
-View, search, and export every payment that flows through your Grain integration. Filter by status, currency, date range, or amount to find exactly what you need.
-
-### Settlements
-
-Track when funds are settled to your payout account. Match individual transactions to settlement batches and download reconciliation reports.
-
-### Analytics
-
-Monitor key metrics such as payment volume, conversion rates, and popular cryptocurrencies. Use date-range filtering and breakdowns to spot trends and inform business decisions.
+A detailed log of every payment that flows through your Grain integration. Filter by status, date range, search for specific transactions, and export to CSV.
 
 ### Settings
 
-Manage API keys, configure webhooks, invite team members, and set notification preferences.
+Manage API keys and webhooks, choose which cryptocurrencies to accept, invite team members, configure security, set notification preferences, and manage billing and payouts.
 
 ## Quick Links
 
 <CardGroup cols={2}>
-  <Card title="View & Search Transactions" icon="magnifying-glass" href="/partner-dashboard/transactions/view-search">
-    Find and filter payments by status, currency, or date range.
+  <Card title="Key Metrics" icon="chart-simple" href="/partner-dashboard/guide/key-metrics">
+    Track sales volume, transaction count, and unique wallets.
   </Card>
-  <Card title="Transaction Details & Statuses" icon="circle-info" href="/partner-dashboard/transactions/transaction-details">
-    Understand what each transaction status means.
+  <Card title="Filters and Performance" icon="filter" href="/partner-dashboard/guide/filters-and-performance">
+    Filter by status and visualize trends over time.
   </Card>
-  <Card title="Export Transaction Data" icon="file-export" href="/partner-dashboard/transactions/export-data">
-    Download records for accounting and reconciliation.
+  <Card title="Payouts and Recent Transactions" icon="money-bill-transfer" href="/partner-dashboard/guide/payouts-and-recent-transactions">
+    View payout summary and latest transactions.
   </Card>
-  <Card title="Settlement & Reconciliation" icon="building-columns" href="/partner-dashboard/settlement-reconciliation">
-    Track payouts and match them to transactions.
+  <Card title="Filtering and Searching" icon="magnifying-glass" href="/partner-dashboard/guide/filtering-and-searching">
+    Find specific transactions and export to CSV.
   </Card>
-  <Card title="Analytics & Reporting" icon="chart-line" href="/partner-dashboard/analytics-reporting">
-    Monitor payment performance with built-in reports.
+  <Card title="Transaction Details" icon="receipt" href="/partner-dashboard/guide/transaction-details">
+    View a full breakdown of any payment.
   </Card>
-  <Card title="API Keys & Credentials" icon="key" href="/partner-dashboard/settings/api-keys">
-    Create and manage your API keys.
+  <Card title="API and Webhooks" icon="code" href="/partner-dashboard/guide/api-and-webhooks">
+    Access API keys and configure webhook endpoints.
   </Card>
-  <Card title="Webhook Configuration" icon="webhook" href="/partner-dashboard/settings/webhook-configuration">
-    Set up endpoints and monitor deliveries.
+  <Card title="Payment Settings" icon="coins" href="/partner-dashboard/guide/payment-settings">
+    Choose which cryptocurrencies and networks to accept.
   </Card>
-  <Card title="Team Members & Roles" icon="users" href="/partner-dashboard/settings/team-members">
-    Invite collaborators and control access.
+  <Card title="Team Management" icon="users" href="/partner-dashboard/guide/team-management">
+    Invite and manage team members.
+  </Card>
+  <Card title="Security" icon="shield-halved" href="/partner-dashboard/guide/security">
+    Enable 2FA and manage IP whitelists.
+  </Card>
+  <Card title="Notifications" icon="bell" href="/partner-dashboard/guide/notifications">
+    Configure email alerts for important events.
+  </Card>
+  <Card title="Billing and Payouts" icon="building-columns" href="/partner-dashboard/guide/billing-and-payouts">
+    Manage payout schedule and bank account.
   </Card>
 </CardGroup>
 

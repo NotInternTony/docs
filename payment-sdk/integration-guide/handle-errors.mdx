@@ -128,12 +128,6 @@ export async function POST(request: Request) {
 
 ---
 
-## Development Mode Behavior
-
-When `CUBEPAY_API_KEY` is not set and `NODE_ENV` is not `production`, the SDK service returns **mock session data** instead of calling the API. This lets you develop and test your UI without real credentials.
-
-Mock sessions use IDs prefixed with `mock-session-` and simulate the full payment flow locally.
-
 ## Next Steps
 
 Set up your [Sandbox Environment](/payment-sdk/testing/test-in-sandbox) to test the full payment flow with test networks.

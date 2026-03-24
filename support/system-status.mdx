@@ -8,8 +8,8 @@ icon: "signal"
 
 You can view the real-time operational status of all Grain services at our dedicated status page:
 
-<Card title="Grain Status Page" icon="chart-line" href="https://status.grain.com">
-  Visit **status.grain.com** to see current uptime, ongoing incidents, and scheduled maintenance windows.
+<Card title="Grain Status Page" icon="chart-line" href="https://status.grain.inc/">
+  Visit **status.grain.inc** to see current uptime, ongoing incidents, and scheduled maintenance windows.
 </Card>
 
 ## Monitored Services
@@ -24,38 +24,11 @@ The Grain REST API that powers payment creation, refunds, webhooks, and all prog
 
 The web-based merchant dashboard used for managing settings, viewing transactions, generating reports, and accessing support.
 
-### Settlement
+### Website
 
-The settlement engine responsible for converting cryptocurrency payments and disbursing funds to your configured bank account or wallet. Settlement status covers both on-chain processing and fiat payouts.
-
-<Tip>
-  If the API is operational but you are experiencing issues, the problem is likely related to your integration configuration. Check the [FAQ](/support/faq) or [contact support](/support/getting-help).
-</Tip>
-
-## Subscribe to Status Updates
-
-Stay informed about incidents and maintenance without having to check the status page manually.
-
-| Method | How to Subscribe |
-|--------|------------------|
-| **Email** | Visit [status.grain.com](https://status.grain.com) and click **Subscribe to Updates** |
-| **RSS** | Add the RSS feed from the status page to your preferred reader |
-| **Webhook** | Configure a status webhook in your Dashboard under **Settings > Notifications** |
-
-<Note>
-  We recommend that production merchants subscribe to at least one notification channel so you are aware of any service disruptions as soon as they occur.
-</Note>
-
-## What to Do During an Outage
-
-If Grain services are experiencing degraded performance or an outage, follow these steps:
-
-1. **Check the status page** at [status.grain.com](https://status.grain.com) for the latest incident updates and estimated resolution times.
-2. **Do not retry failed requests in a tight loop.** Use exponential backoff in your integration to avoid adding load to recovering services.
-3. **Queue payments locally** if your application supports it, and process them once services are restored.
-4. **Review the incident postmortem** once published on the status page. Postmortems include root cause analysis and any actions you may need to take.
-5. **Contact support** if you believe your account is specifically affected or if you need help reconciling transactions after the incident.
+The public-facing Grain website. This covers availability and performance of the main Grain site.
 
 <Tip>
-  Design your integration to handle transient failures gracefully. Our [API Reference](/api-reference) documents recommended retry strategies and idempotency key usage.
+  If the API is operational but you are experiencing issues, the problem is likely related to your integration configuration. Please contact us to investigate any issues.
 </Tip>
+

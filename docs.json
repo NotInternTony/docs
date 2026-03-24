@@ -29,42 +29,18 @@
         "url": "get-started",
         "groups": [
           {
-            "group": "Onboarding & KYB",
-            "pages": [
-              "get-started/onboarding/kyb-requirements",
-              "get-started/onboarding/kyb-dashboard",
-              "get-started/onboarding/onboarding-faq"
-            ]
-          },
-          {
-            "group": "Environment Setup",
-            "pages": [
-              "get-started/environment-setup/access-credentials",
-              "get-started/environment-setup/sandbox-environment",
-              "get-started/environment-setup/configure-webhooks"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "get-started/quick-start-guide",
-              "get-started/go-live-checklist"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "How Grain Works",
-        "url": "how-grain-works",
-        "groups": [
-          {
             "group": "How Grain Works",
             "pages": [
               "how-grain-works/overview",
               "how-grain-works/payment-lifecycle",
-              "how-grain-works/settlement",
-              "how-grain-works/supported-cryptocurrencies",
-              "how-grain-works/pricing"
+              "how-grain-works/settlement"
+            ]
+          },
+          {
+            "group": "Onboarding & KYB",
+            "pages": [
+              "get-started/onboarding/kyb-requirements",
+              "get-started/onboarding/kyb-dashboard"
             ]
           }
         ]
@@ -116,27 +92,30 @@
             ]
           },
           {
-            "group": "Transactions",
+            "group": "Your Business at a Glance",
             "pages": [
-              "partner-dashboard/transactions/view-search",
-              "partner-dashboard/transactions/transaction-details",
-              "partner-dashboard/transactions/export-data"
+              "partner-dashboard/guide/key-metrics",
+              "partner-dashboard/guide/filters-and-performance",
+              "partner-dashboard/guide/payouts-and-recent-transactions"
             ]
           },
           {
-            "group": "Reports",
+            "group": "Managing Transactions",
             "pages": [
-              "partner-dashboard/settlement-reconciliation",
-              "partner-dashboard/analytics-reporting"
+              "partner-dashboard/guide/viewing-transactions",
+              "partner-dashboard/guide/filtering-and-searching",
+              "partner-dashboard/guide/transaction-details"
             ]
           },
           {
-            "group": "Settings",
+            "group": "Configuring Settings",
             "pages": [
-              "partner-dashboard/settings/api-keys",
-              "partner-dashboard/settings/webhook-configuration",
-              "partner-dashboard/settings/team-members",
-              "partner-dashboard/settings/notification-preferences"
+              "partner-dashboard/guide/api-and-webhooks",
+              "partner-dashboard/guide/payment-settings",
+              "partner-dashboard/guide/team-management",
+              "partner-dashboard/guide/security",
+              "partner-dashboard/guide/notifications",
+              "partner-dashboard/guide/billing-and-payouts"
             ]
           }
         ]
@@ -148,10 +127,7 @@
           {
             "group": "Support & Resources",
             "pages": [
-              "support/getting-help",
-              "support/system-status",
-              "support/faq",
-              "support/release-notes"
+              "support/system-status"
             ]
           }
         ]

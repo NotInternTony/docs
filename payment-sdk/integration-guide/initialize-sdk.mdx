@@ -42,21 +42,6 @@ The SDK reads configuration from environment variables automatically. You can cu
 | Option | Environment Variable | Description |
 | --- | --- | --- |
 | Merchant ID | `NEXT_PUBLIC_CUBEPAY_MERCHANT_ID` | **Required.** Identifies your merchant account |
-| API host | `NEXT_PUBLIC_CUBEPAY_API_HOST` | Override the default API endpoint |
-| RPC endpoints | `NEXT_PUBLIC_CUBEPAY_RPC_ENDPOINTS` | Custom RPC URLs per chain ID |
-| Test accounts | `NEXT_PUBLIC_CUBEPAY_TEST_ACCOUNTS` | Private keys for development testing |
-
-### Custom RPC Endpoints
-
-Override the default RPC endpoints for specific chains:
-
-```bash
-# JSON format
-NEXT_PUBLIC_CUBEPAY_RPC_ENDPOINTS='{"1":"https://eth-mainnet.example.com","8453":"https://base-mainnet.example.com"}'
-
-# Comma-separated format
-NEXT_PUBLIC_CUBEPAY_RPC_ENDPOINTS="1=https://eth-mainnet.example.com, 8453=https://base-mainnet.example.com"
-```
 
 ## Theme Customization
 
