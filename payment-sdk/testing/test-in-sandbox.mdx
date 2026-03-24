@@ -10,7 +10,6 @@ Point the SDK to the sandbox API by setting the host environment variable:
 
 ```bash
 CUBEPAY_API_HOST=https://api.sandbox.pay.grain.inc
-NEXT_PUBLIC_CUBEPAY_API_HOST=https://api.sandbox.pay.grain.inc
 ```
 
 All other environment variables (`NEXT_PUBLIC_CUBEPAY_MERCHANT_ID`, `CUBEPAY_API_KEY`) use your sandbox credentials from the [Grain Dashboard](https://dashboard.grain.inc).
@@ -43,29 +42,6 @@ All other environment variables (`NEXT_PUBLIC_CUBEPAY_MERCHANT_ID`, `CUBEPAY_API
     Go to the [Grain Dashboard](https://dashboard.grain.inc) and navigate to **Transactions**. Confirm your test payment appears with the expected status.
   </Step>
 </Steps>
-
----
-
-## Development Mode (No Credentials)
-
-When `CUBEPAY_API_KEY` is not set and `NODE_ENV` is not `production`, the SDK automatically returns **mock session data**. This lets you build and test your UI without any API credentials.
-
-Mock sessions:
-- Use IDs prefixed with `mock-session-`
-- Return simulated responses for `GET /api/payment-sessions`
-- Skip real API calls entirely
-
-```typescript
-// In development without credentials, this returns mock data
-const result = await cubePayService.executePayment({
-  amount: 10.0,
-  currency: "USD",
-});
-```
-
-<Tip>
-  Development mode is useful for UI development and component testing. Use the full sandbox environment for integration testing before going live.
-</Tip>
 
 ---
 

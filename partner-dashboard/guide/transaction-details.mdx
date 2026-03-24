@@ -1,0 +1,44 @@
+---
+title: "Transaction Details"
+description: "View a full breakdown of any individual payment"
+icon: "receipt"
+---
+
+Click on any transaction in the list to open the **Transaction Details** panel. This gives you a comprehensive breakdown of the payment in one view.
+
+<Frame>
+  <img src="/images/dashboard/transaction-details.png" alt="Transaction details view" />
+</Frame>
+
+### Transaction Overview
+
+The top section displays the core payment information:
+
+- **Date & Time** — When the transaction was initiated (e.g., Jan 27, 2025 at 03:22PM)
+- **USD Volume** — The transaction value in USD
+- **Asset Type** — The cryptocurrency used for the payment (e.g., USDC)
+- **Network** — The blockchain network the payment was processed on (e.g., Ethereum)
+
+### Customer Info
+
+Details about the customer who made the payment:
+
+- **Wallet Address** — The wallet that sent the payment
+- **Location** — The customer's country of origin
+
+### Booking Details
+
+If your integration passes booking metadata, this section displays:
+
+- **Reference ID** — Your internal booking reference (e.g., `BK-2025-001472`)
+- **Service** — The type of service or product purchased
+- **Notes** — Any additional details associated with the booking
+
+### Transaction Timeline
+
+The timeline at the bottom tracks each stage the transaction has passed through. Each step is visually connected so you can see exactly where the payment is in its lifecycle:
+
+1. **Started** — Payment session created
+2. **Processing** — Payment detected on-chain
+3. **Settled** — Funds confirmed and settled
+4. **Paid Out** — Funds transferred to your payout account
