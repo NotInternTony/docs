@@ -1,0 +1,10 @@
+/* Divider lines between main sidebar groups */
+#navigation-items > div.mt-6 {
+  border-top: 1px solid #e5e5e5;
+  padding-top: 16px;
+}
+
+/* Dark mode support */
+.dark #navigation-items > div.mt-6 {
+  border-top-color: #333;
+}
