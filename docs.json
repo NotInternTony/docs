@@ -12,24 +12,21 @@
     "dark": "/favicon-dark.svg"
   },
   "navigation": {
-    "tabs": [
+    "groups": [
       {
-        "tab": "Home",
-        "groups": [
-          {
-            "group": "Home",
-            "pages": [
-              "index"
-            ]
-          }
+        "group": "Home",
+        "pages": [
+          "index"
         ]
       },
       {
-        "tab": "Get Started",
-        "url": "get-started",
-        "groups": [
+        "group": "Get Started",
+        "icon": "rocket",
+        "pages": [
           {
             "group": "How Grain Works",
+            "icon": "circle-info",
+            "expanded": false,
             "pages": [
               "how-grain-works/overview",
               "how-grain-works/payment-lifecycle",
@@ -38,6 +35,8 @@
           },
           {
             "group": "Onboarding & KYB",
+            "icon": "clipboard-check",
+            "expanded": false,
             "pages": [
               "get-started/onboarding/kyb-requirements",
               "get-started/onboarding/kyb-dashboard"
@@ -46,11 +45,13 @@
         ]
       },
       {
-        "tab": "Payment SDK",
-        "url": "payment-sdk",
-        "groups": [
+        "group": "Payment SDK",
+        "icon": "code",
+        "pages": [
           {
             "group": "Getting Started",
+            "icon": "play",
+            "expanded": false,
             "pages": [
               "payment-sdk/overview",
               "payment-sdk/installation-setup"
@@ -58,6 +59,8 @@
           },
           {
             "group": "Integration Guide",
+            "icon": "puzzle-piece",
+            "expanded": false,
             "pages": [
               "payment-sdk/integration-guide/initialize-sdk",
               "payment-sdk/integration-guide/create-payment-session",
@@ -67,12 +70,16 @@
           },
           {
             "group": "Testing",
+            "icon": "flask",
+            "expanded": false,
             "pages": [
               "payment-sdk/testing/test-in-sandbox"
             ]
           },
           {
             "group": "API Reference",
+            "icon": "square-terminal",
+            "expanded": false,
             "pages": [
               "payment-sdk/api-reference/authentication",
               "payment-sdk/api-reference/endpoints",
@@ -82,17 +89,14 @@
         ]
       },
       {
-        "tab": "Grain Dashboard",
-        "url": "partner-dashboard",
-        "groups": [
-          {
-            "group": "Grain Dashboard",
-            "pages": [
-              "partner-dashboard/overview"
-            ]
-          },
+        "group": "Grain Dashboard",
+        "icon": "chart-line",
+        "pages": [
+          "partner-dashboard/overview",
           {
             "group": "Your Business at a Glance",
+            "icon": "gauge",
+            "expanded": false,
             "pages": [
               "partner-dashboard/guide/key-metrics",
               "partner-dashboard/guide/filters-and-performance",
@@ -101,6 +105,8 @@
           },
           {
             "group": "Managing Transactions",
+            "icon": "receipt",
+            "expanded": false,
             "pages": [
               "partner-dashboard/guide/viewing-transactions",
               "partner-dashboard/guide/filtering-and-searching",
@@ -109,6 +115,8 @@
           },
           {
             "group": "Configuring Settings",
+            "icon": "gear",
+            "expanded": false,
             "pages": [
               "partner-dashboard/guide/api-and-webhooks",
               "partner-dashboard/guide/payment-settings",
@@ -121,15 +129,10 @@
         ]
       },
       {
-        "tab": "Support & Resources",
-        "url": "support",
-        "groups": [
-          {
-            "group": "Support & Resources",
-            "pages": [
-              "support/system-status"
-            ]
-          }
+        "group": "Support & Resources",
+        "icon": "life-ring",
+        "pages": [
+          "support/system-status"
         ]
       }
     ]
@@ -152,22 +155,12 @@
     }
   },
   "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+    "options": []
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/GrainPayments",
+      "linkedin": "https://www.linkedin.com/company/graininc"
     }
   }
 }
