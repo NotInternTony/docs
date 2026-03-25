@@ -8,6 +8,35 @@ icon: "clock-rotate-left"
   Subscribe to release notifications in your Dashboard under **Settings > Notifications** to get notified when new versions are published.
 </Tip>
 
+### v2.5.0 --- March 24, 2026
+
+**Added**
+- Automatic capture of funded payment sessions with a new explicit capture API for greater payment control.
+- Fee computation service calculating Grain fees, network fees, and net payouts based on partner take rates and transaction status.
+- Core data models for Users, Partners, Team Members, Take Rates, and Payments, establishing the foundation for partner management.
+- Persistent payment records with rich details including currency, network/token info, fee breakdowns, and net payout — all normalized to cents with idempotent handling.
+- Erebor KYB service integration for full business and person applicant management, onboarding flows, and document upload/retrieval.
+- End-of-day Slack transaction report powered by Trigger.dev, delivering daily aggregated payment summaries.
+- Threaded Slack notifications per payment transaction with persistent thread IDs for easier tracking.
+
+**Improved**
+- Multi-AZ Redis failover for production, ensuring high availability with automatic failover across availability zones.
+- Optional custom domain support for API (ALB) and CDN (CloudFront) via Route53 alias records with ACM certificate integration.
+- WAF rate-limiting rule protecting the ALB at 2,000 requests per 5 minutes per IP.
+- VPC endpoints for S3, Secrets Manager, KMS, and STS to reduce NAT costs and improve latency.
+- AWS Backup integration with daily automated backups (7-day retention for dev, 35-day for prod) and optional cross-region backup copy.
+- GuardDuty findings forwarded to SNS via EventBridge and AWS Config recorder added for Vanta compliance.
+- CloudWatch security alarms wired to SNS for root account usage, MFA-less console login, failed logins, and unauthorized API calls.
+- Resource tagging across all CDK stacks (`Environment`, `Project`, `ManagedBy`) for compliance and cost attribution.
+- Lambda reserved concurrency limits set per environment to prevent account-level exhaustion.
+- SQS dead letter queue added for failed async Lambda invocations with KMS encryption and 14-day retention.
+
+**Fixed**
+- Payment processing now uses the specified amount rather than a hardcoded default.
+- Simplified API key handling in payment sessions and improved webhook error handling and logging.
+
+---
+
 ### v2.4.0 --- March 10, 2026
 
 **Added**
