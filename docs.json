@@ -132,7 +132,8 @@
         "group": "Support & Resources",
         "icon": "life-ring",
         "pages": [
-          "support/system-status"
+          "support/system-status",
+          "support/release-notes"
         ]
       }
     ]
