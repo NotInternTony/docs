@@ -133,7 +133,8 @@
         "icon": "life-ring",
         "pages": [
           "support/system-status",
-          "support/release-notes"
+          "support/release-notes",
+          "support/complaints"
         ]
       }
     ]
